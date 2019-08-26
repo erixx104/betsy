@@ -11,7 +11,7 @@
                 v-for="(user) in this.$store.getters['players/listActive']"
                 :key="user.id"
               :class="user.id == userID ? 'grey lighten-4':''">
-                <v-list-item-avatar :color="user.color" size="28">
+                <v-list-item-avatar :color="user.color" class="caption" size="24">
                   {{user.initials}}
                 </v-list-item-avatar>  
                 <v-list-item-content>

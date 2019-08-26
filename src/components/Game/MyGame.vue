@@ -7,6 +7,7 @@
       <v-flex xs9 md9 mt-4 pr-3>
         
           <join-bet ref="joinBet"></join-bet>
+          <resolve-bet ref="resolveBet"></resolve-bet>
           <new-bet class="mb-6"></new-bet>
           
           <v-subheader v-if="(this.requestedBets.length)">Angebotene Wetten</v-subheader>
@@ -37,28 +38,38 @@
           </v-banner>
           
           <v-subheader>Aktive Wetten</v-subheader>
-          <v-banner class="mb-2" elevation="2" icon="mdi-volleyball mdi-spin" single-line v-for="(runningBet) in this.runningBets" :key="runningBet.id">
+          <v-banner class="mb-2" elevation="2" single-line v-for="(runningBet) in this.runningBets" :key="runningBet.id">
             <v-row>
               <v-col>
                 {{ runningBet.q }}
-              </v-col>
-              <v-col>
-                <div v-if="'wager' in runningBet">
-                  <v-tooltip bottom  v-for="(value, name) in runningBet.wager" :key="name">
-                    <template v-slot:activator="{ on }">
-                      <v-list-item-avatar v-on="on" class="mt-0 mr-0 mb-0 ml-0" :color="$store.getters['players/list'].find(x => x.id==name).color" size="28" :key="name">
-                        {{ $store.getters['players/list'].find(x => x.id==name).initials }}     
-                      </v-list-item-avatar> 
-                    </template>
-                    <span>{{ $store.getters['players/list'].find(x => x.id==name).name }}</span>
-                  </v-tooltip>
-                </div>
+                <ol class="body-2">
+                  <li v-for="(answer, i) in runningBet.a" :key="i">{{ answer }}
+                    <span v-for="(value, name) in runningBet.selection" :key="name">
+                      <v-tooltip bottom v-if="value==i">
+                        <template v-slot:activator="{ on }">
+                          <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==name).color" size="10" :key="name">
+                          </v-list-item-avatar> 
+                        </template>
+                        <span>{{ $store.getters['players/list'].find(x => x.id==name).name }}</span>
+                      </v-tooltip>
+                    </span>
+                  </li>
+                </ol>
               </v-col>
             </v-row>
+            <v-row class="caption mt-0 pt0">
+              
+            </v-row>
+            
             <template v-slot:actions>
-              <v-btn class="mb-1" small depressed >
+              
+              <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.wager).length*0.51))" size="30" color="grey">{{ Math.ceil(Object.keys(runningBet.wager).length*0.51) }}</v-progress-circular>
+              
+              <v-btn :disabled="!(userID in runningBet.wager)" class="mb-1" small color="secondary" @click="resolve(runningBet.id)">
                 auflösen
               </v-btn>
+
+              
             </template>
           </v-banner>
           
@@ -73,6 +84,7 @@
 <script>
   import NewBet from './NewBet.vue'
   import JoinBet from './JoinBet.vue'
+  import ResolveBet from './ResolveBet.vue'
   import Scoreboard from './Scoreboard.vue'
 
   export default {
@@ -87,6 +99,7 @@
     components:{
          'new-bet':NewBet,
          'join-bet':JoinBet,
+         'resolve-bet':ResolveBet,
          'scoreboard':Scoreboard
      },
     created() {
@@ -111,6 +124,12 @@
         this.$refs.joinBet.content=this.$store.getters['bets/listActiveState'].find(x => x.id==value)
         this.$refs.joinBet.dialog=1
         console.log(this.$refs.joinBet.content)
+      },
+      
+      resolve (value) {
+        this.$refs.resolveBet.content=this.$store.getters['bets/listActiveState'].find(x => x.id==value)
+        this.$refs.resolveBet.dialog=1
+        console.log(this.$refs.resolveBet.content)
       },
       
       
@@ -162,7 +181,7 @@
             betCreated=bet.created_at.seconds
           else
             betCreated=Date.parse(bet.created_at)/1000
-
+            
           age=(Math.round(Date.now()/ 1000)-betCreated)
           if(bet.state=="requested"){
             
@@ -177,7 +196,7 @@
             this.requestedBets.push(Object.assign(bet, {age,color,pbWidth}))
           }
           else if(bet.state=="running"){
-            this.runningBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds) }))
+            this.runningBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds), nVerdicts: ("verdict" in bet)?Object.keys(bet.verdict).length:null }))
           }
           else
             console.log("That shouldn't happen: "+bet)
@@ -196,6 +215,20 @@
       
       activeStateBetsGetter () {
         return this.$store.getters['bets/listActiveState']  
+      },
+      
+      verdicts() {
+        var verdictList = []
+        for(var bet of this.$store.getters['bets/listActiveState']){
+          if(bet.state=="running"){
+            if("verdict" in bet)
+              verdictList[bet.id]=Object.keys(bet.verdict).length
+            else
+              verdictList[bet.id]=0
+          }
+        }
+        
+        return verdictList
       }
 
     },
@@ -213,7 +246,16 @@
       activeStateBetsGetter() {
         this.watchdog()
         //console.log(".")
+      },
+      
+      verdictList: {
+          handler: function(newVal, oldVal) {
+              console.log(newVal)
+              console.log(oldVal)
+          },
+          deep: true
       }
+      
     }
   }
 </script>
