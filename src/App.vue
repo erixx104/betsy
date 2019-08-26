@@ -1,31 +1,45 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+  <v-app>
+    <v-app-bar app>
+      <v-toolbar-title class="headline text-uppercase">
+        <span class="mr-2">Betsy</span>
+        <span class="font-weight-light">alpha 0.2</span>
+      </v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-toolbar-items>
+        <v-btn 
+          v-if='this.$store.getters.activeGame'
+          @click='onLeaveGame()'
+          text>
+          <v-icon small left>mdi-exit-run</v-icon>
+          Leave game
+        </v-btn>
+      </v-toolbar-items>
+    </v-app-bar>
+    
+    <div class="text-center">
+      <v-overlay :value="this.$store.getters.loader">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+      </v-overlay>
     </div>
-    <router-view/>
-  </div>
+
+    <v-content class="mt-0 ml-0 mr-0">
+      <router-view></router-view>
+    </v-content>
+  </v-app>
 </template>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-}
+<script>
+  export default {
+    data: () => ({
+      
+      //
+    }),
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+    methods: {
+      onLeaveGame () {
+        this.$store.dispatch('leaveGame')
+      }
+    }
+  };
+</script>
