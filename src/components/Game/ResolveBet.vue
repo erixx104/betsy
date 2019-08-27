@@ -57,16 +57,15 @@
             this.$store.dispatch('bets/patch', {id : this.content.id, verdict })
             .catch(console.error)
             .then(() =>{
-               // this.$store.dispatch('bets/insert', selection)
-                //.catch(console.error)
-                //.then(() =>{
-                    this.dialog = false
-                    this.userAnswer = null
-                    this.valid = true
-                //})
+              // reset overlay
+              this.dialog = false
+              this.userAnswer = null
+              this.valid = true
+              
+              // if enough verdicts available --> Judge
             })
-                
-            }
+
+          }
  
         },
         

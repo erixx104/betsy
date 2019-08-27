@@ -26,7 +26,7 @@ const players = {
      //return state.synced
       if((state.synced!= null)&&(state.synced!=undefined))
         return Object.values(state.synced)
-          .filter(player => ( (player.last_online+120000)>Date.now()) )
+          .filter(player => ( (player.last_online+120000)>Date.now()) && player.activeGame!=null)
           .sort((playerA, playerB) => {
           return playerB["score"] - playerA["score"]
         })
@@ -36,17 +36,28 @@ const players = {
     
     // get Last on from specific User
     getUserLastOn: state => userID => {
-       return state.synced[userID].last_online
+        if((state.synced!= null)&&(state.synced!=undefined) && userID in state.synced)
+          return state.synced[userID].last_online
+        else
+          return null
       }
   },
   mutations: {
     reset (state) {
       state.synced=null
+    },
+    
+    addUserScore (state, payload) {
+      state.synced[payload.user].score+=payload.score       
     }
   },
   actions: {
     reset ({commit}) {
       commit('reset')
+    },
+    
+    addUserScore({commit}, payload){
+      commit('addUserScore', payload);
     },
 
   }

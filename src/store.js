@@ -80,11 +80,16 @@ const storeData = {
     leaveGame({state, dispatch}) {
        return new Promise((resolve, reject) => {
 
+        //set 'activeGame' @ Player (in Games) to null to indicate, that the user actively left the game
+        dispatch('players/patch', {id : state.user.id, activeGame : null })
+                    .catch(console.error)
+                    .then(() =>{})
+
         //close connection to game-specific players....
-        dispatch('players/closeDBChannel')
+        dispatch('players/closeDBChannel', {clearModule: true})
             .catch((error) => {reject("close PlayersDB ging nicht: "+error)}).then(() => {
               //close connection to game-specific bets....
-              dispatch('bets/closeDBChannel')
+              dispatch('bets/closeDBChannel', {clearModule: true})
                 .catch((error) => {reject("close BetsDB ging nicht: "+error)}).then(() => {
                   //remove user from Realtime-Database
                   Firebase.database().ref('/users/' + state.user.id).remove().then(() => {
@@ -195,13 +200,42 @@ Firebase.auth().onAuthStateChanged((user) =>{
         console.log(snapshot.val())
         store.dispatch('setUser', snapshot.val()).then(()=>{
           
-          if( store.getters.user.activeGame ){
-            //open connection do game-specific players....
-            store.dispatch('players/openDBChannel',{gameID: store.getters.user.activeGame}).catch(console.error)
-            //...and bets overview
-            store.dispatch('bets/openDBChannel',{gameID: store.getters.user.activeGame}).catch(console.error)  
+          if( store.getters.user!=null && ("activeGame" in store.getters.user) && store.getters.user.activeGame ){
+            
+            try {
+              //open connection do game-specific players....
+              store.dispatch('players/openDBChannel',{gameID: store.getters.user.activeGame})
+            } catch (e) {
+              if (e.includes('openDBChannel was already called')) {
+                return // do nothing because this listener is already open
+              }
+              // alert the user when another problem occurred. Maybe an internet failure etc.?
+              alert(`something went wrong. (${e})`)
+            }
+            
+            try {
+              //...and bets overview
+              store.dispatch('bets/openDBChannel',{gameID: store.getters.user.activeGame}) 
+            } catch (e) {
+              if (e.includes('openDBChannel was already called')) {
+                return // do nothing because this listener is already open
+              }
+              // alert the user when another problem occurred. Maybe an internet failure etc.?
+              alert(`something went wrong. (${e})`)
+            }
+            
+            
           }else{
-            store.dispatch('games/openDBChannel',{where: [['active','==',true]]})  
+            try {
+              store.dispatch('games/openDBChannel',{where: [['active','==',true]]})  
+            } catch (e) {
+              if (e.includes('openDBChannel was already called')) {
+                return // do nothing because this listener is already open
+              }
+              // alert the user when another problem occurred. Maybe an internet failure etc.?
+              alert(`something went wrong. (${e})`)
+            }
+            
           }
         })
       })

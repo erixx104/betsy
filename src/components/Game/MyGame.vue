@@ -93,7 +93,7 @@
       now : Date.now(),
       requestedBets : [],
       runningBets : [],
-      watchdogInterval : null
+      watchdogInterval : null,
       
     }),
     components:{
@@ -165,7 +165,8 @@
             }else{
               console.log("Bieter: '"+bet.q+"': "+Object.keys(bet.wager).length)
               if(Object.keys(bet.wager).length<2){
-                this.$store.dispatch('bets/patch', {id : bet.id, state:'declined'})  
+                this.$store.dispatch('bets/patch', {id : bet.id, state:'declined'})
+                //for(player)
               }else{
                 this.$store.dispatch('bets/patch', {id : bet.id, state:'running'})
               }
@@ -202,6 +203,13 @@
             console.log("That shouldn't happen: "+bet)
         }
       },
+      
+      playSound (sound) {
+      if(sound) {
+        var audio = new Audio(sound);
+        audio.play();
+      }
+    }
     },
     
     computed: {
@@ -244,6 +252,7 @@
       },
       
       activeStateBetsGetter() {
+        this.playSound(require('@/assets/sound5.mp3'))
         this.watchdog()
         //console.log(".")
       },

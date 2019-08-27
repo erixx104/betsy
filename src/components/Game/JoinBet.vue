@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="600px">
     <v-form
-        ref="newBetForm"
+        ref="joinBetForm"
         v-model="valid"
         @submit.prevent.native="submitBet"
         lazy-validation>  
@@ -15,7 +15,7 @@
                 <v-subheader>Deine Antwort:</v-subheader>
               </v-row>
               <v-row>
-                <v-radio-group v-model="userAnswer" class="pl-2 pr-2 mt-0 pt-0 mb-0 pb-0">
+                <v-radio-group v-model="userAnswer" :rules="AnswerRules" class="pl-2 pr-2 mt-0 pt-0 mb-0 pb-0">
                   <v-radio
                     v-for="(answer, i) in content.a" 
                     :key="i"
@@ -60,28 +60,34 @@
             dialog: false,
             valid: true,
             userAnswer : null,
-            bet : null
+            bet : null,
+            AnswerRules: [
+                v => v!=null || 'Antwortmöglichkeit auswählen',
+              ],
         }),
         created (){
 
         },
         methods: {
           submitBet () {
-            var wager = {}
-            var selection = {}
-            wager[this.$store.getters.userID]=this.bet
-            selection[this.$store.getters.userID]=this.userAnswer
-            this.$store.dispatch('bets/patch', {id : this.content.id, wager, selection })
-            .catch(console.error)
-            .then(() =>{
-               // this.$store.dispatch('bets/insert', selection)
-                //.catch(console.error)
-                //.then(() =>{
+            if (this.$refs.joinBetForm.validate()) {
+              
+              var wager = {}
+              var selection = {}
+              
+              wager[this.$store.getters.userID]=this.bet
+              selection[this.$store.getters.userID]=this.userAnswer
+              
+              this.$store.dispatch('bets/patch', {id : this.content.id, wager, selection })
+                .catch(console.error)
+                .then(() =>{
                     this.dialog = false
-                //})
-            })
-                
-            }
+                    this.$store.dispatch('players/addUserScore', {user: this.$store.getters.userID, score: -this.bet})
+  
+                })
+                  
+              }
+          }
  
         },
         
