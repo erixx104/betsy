@@ -18,13 +18,13 @@
               </v-col>
               <v-col>
                 <div v-if="'wager' in requestedBet">
-                  <v-tooltip bottom  v-for="(value, name) in requestedBet.wager" :key="name">
+                  <v-tooltip bottom  v-for="(value, id) in requestedBet.wager" :key="id">
                     <template v-slot:activator="{ on }">
-                      <v-list-item-avatar v-on="on" class="mt-0 mr-0 mb-0 ml-0" :color="$store.getters['players/list'].find(x => x.id==name).color" size="28" :key="name">
-                        {{ $store.getters['players/list'].find(x => x.id==name).initials }}     
+                      <v-list-item-avatar v-on="on" class="mt-0 mr-0 mb-0 ml-0" :color="$store.getters['players/list'].find(x => x.id==id).color" size="28" :key="id">
+                        {{ $store.getters['players/list'].find(x => x.id==id).initials }}     
                       </v-list-item-avatar> 
                     </template>
-                    <span>{{ $store.getters['players/list'].find(x => x.id==name).name }}</span>
+                    <span>{{ $store.getters['players/list'].find(x => x.id==id).name }}</span>
                   </v-tooltip>
                 </div>
               </v-col>
@@ -44,13 +44,13 @@
                 {{ runningBet.q }}
                 <ol class="body-2">
                   <li v-for="(answer, i) in runningBet.a" :key="i">{{ answer }}
-                    <span v-for="(value, name) in runningBet.selection" :key="name">
+                    <span v-for="(value, id) in runningBet.selection" :key="id">
                       <v-tooltip bottom v-if="value==i">
                         <template v-slot:activator="{ on }">
-                          <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==name).color" size="10" :key="name">
+                          <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==id).color" size="10" :key="id">
                           </v-list-item-avatar> 
                         </template>
-                        <span>{{ $store.getters['players/list'].find(x => x.id==name).name }}</span>
+                        <span>{{ $store.getters['players/list'].find(x => x.id==id).initials }}</span>
                       </v-tooltip>
                     </span>
                   </li>
@@ -107,10 +107,25 @@
       if( !this.$store.getters.activeGame ){
         console.log('No active Game. Redirect to home')
         this.$router.push({ path: `/` })
-      }
+      }else{
       
-      this.watchdog()
-      this.watchdogInterval = setInterval(() => {this.watchdog()}, 1000)
+        console.log("Active Game detected -> let's start up the database connections")
+        //open connection to game-specific bets....
+        this.$store.dispatch('bets/openDBChannel',{gameID: this.$store.getters.activeGame})
+        
+        //open connection to game-specific players....
+        this.$store.dispatch('players/openDBChannel',{gameID: this.$store.getters.activeGame})
+        
+        //if current user is not part of the game (not in the players list) -> add current user
+        console.log("check if user is already part of the game...")
+        if(! (this.$store.getters.userID in this.$store.getters['players/userExists']) )
+          this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
+          
+        this.watchdog()
+        this.watchdogInterval = setInterval(() => {this.watchdog()}, 10000)
+
+      }      
+
 
     },
     
@@ -134,6 +149,12 @@
       
       
       watchdog () {
+        
+        //Workaround: if current user is not part of the game (not in the players list) -> add current user
+        if(!this.$store.getters['players/userExists'](this.$store.getters.userID))      
+          this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
+        //////
+        
         if(((Date.now()-this.$store.getters['players/getUserLastOn'](this.$store.getters.userID)) / 1000) > 30){
           console.log("Alive! "+Date.now())
           this.$store.dispatch('players/patch', {id : this.$store.getters.userID, last_online : Date.now() })
@@ -243,9 +264,15 @@
     
     watch: {
       
-      // check if user has successfully entered the game -> "has an active Game"
+      // check if user has a an active Game -> if not -> go to main page
       userGame (value) {
         if(!value){
+          
+          // close DB connections to players and bets
+          this.$store.dispatch('players/closeDBChannel', {clearModule: true})
+          this.$store.dispatch('bets/closeDBChannel', {clearModule: true})
+          
+          console.log("Let's switch to home.....")
           this.$router.push({ path: `/` })
         }
         //this.$store.dispatch('loaderOff')
@@ -254,7 +281,6 @@
       activeStateBetsGetter() {
         this.playSound(require('@/assets/sound5.mp3'))
         this.watchdog()
-        //console.log(".")
       },
       
       verdictList: {

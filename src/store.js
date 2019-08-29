@@ -78,38 +78,23 @@ const storeData = {
     },
     
     leaveGame({state, dispatch}) {
-       return new Promise((resolve, reject) => {
 
         //set 'activeGame' @ Player (in Games) to null to indicate, that the user actively left the game
         dispatch('players/patch', {id : state.user.id, activeGame : null })
                     .catch(console.error)
-                    .then(() =>{})
-
-        //close connection to game-specific players....
-        dispatch('players/closeDBChannel', {clearModule: true})
-            .catch((error) => {reject("close PlayersDB ging nicht: "+error)}).then(() => {
-              //close connection to game-specific bets....
-              dispatch('bets/closeDBChannel', {clearModule: true})
-                .catch((error) => {reject("close BetsDB ging nicht: "+error)}).then(() => {
-                  //remove user from Realtime-Database
-                  Firebase.database().ref('/users/' + state.user.id).remove().then(() => {
-                    //open connection to games overview
-                    dispatch('games/openDBChannel',{where: [['active','==',true]]})
-                      .catch((error) => {reject("Konnte Kanal zur Games-DB nicht öffnen: "+error)}).then(() => {
-                        
-                        Firebase.auth().signOut().then(function() {
-                          //commit('setUser', null)
-                          console.log('Signed Out')        
-                        }, function(error) {
-                          console.error('Sign Out Error', error)
-                        });
+                    .then(() =>{
                       
+                      //...then remove active user from Firebase DB
+                      Firebase.database().ref('/users/' + state.user.id).remove().then(() => {
+                          //...then signout
+                          Firebase.auth().signOut().then(function() {
+                              //commit('setUser', null)
+                              console.log('Signed Out')        
+                            }, function(error) {
+                              console.error('Sign Out Error', error)
+                            });
+                      })
                     })
-                  })
-                  
-                })
-            })  
-      })
     },
     
     registerUser ({commit}, payload) {
@@ -157,7 +142,10 @@ const storeData = {
 
     // is there an active game ongoing?
     activeGame (state) {
-      return (state.user != null && state.user.activeGame != '' && state.user.activeGame != null && state.user.activeGame != undefined)
+      if(state.user != null && state.user.activeGame != '' && state.user.activeGame != null && state.user.activeGame != undefined)
+        return state.user.activeGame
+      else
+        return null
     },
     
     // return user object
@@ -195,52 +183,13 @@ initFirebase()
 //When ever the user authentication state changes write the user to vuex.
 Firebase.auth().onAuthStateChanged((user) =>{
   if(user){
-      console.log('auth()-StateChanged FIRED!! UID: '+user.uid)
+      console.log('auth()-State: UID='+user.uid)
       Firebase.database().ref('/users/' + user.uid).on('value', function(snapshot) {
-        console.log(snapshot.val())
-        store.dispatch('setUser', snapshot.val()).then(()=>{
-          
-          if( store.getters.user!=null && ("activeGame" in store.getters.user) && store.getters.user.activeGame ){
-            
-            try {
-              //open connection do game-specific players....
-              store.dispatch('players/openDBChannel',{gameID: store.getters.user.activeGame})
-            } catch (e) {
-              if (e.includes('openDBChannel was already called')) {
-                return // do nothing because this listener is already open
-              }
-              // alert the user when another problem occurred. Maybe an internet failure etc.?
-              alert(`something went wrong. (${e})`)
-            }
-            
-            try {
-              //...and bets overview
-              store.dispatch('bets/openDBChannel',{gameID: store.getters.user.activeGame}) 
-            } catch (e) {
-              if (e.includes('openDBChannel was already called')) {
-                return // do nothing because this listener is already open
-              }
-              // alert the user when another problem occurred. Maybe an internet failure etc.?
-              alert(`something went wrong. (${e})`)
-            }
-            
-            
-          }else{
-            try {
-              store.dispatch('games/openDBChannel',{where: [['active','==',true]]})  
-            } catch (e) {
-              if (e.includes('openDBChannel was already called')) {
-                return // do nothing because this listener is already open
-              }
-              // alert the user when another problem occurred. Maybe an internet failure etc.?
-              alert(`something went wrong. (${e})`)
-            }
-            
-          }
-        })
+        store.dispatch('setUser', snapshot.val())
       })
       
   }else{
+      console.log('auth()-State: no User')
       store.dispatch('setUser', null);
   }
 });

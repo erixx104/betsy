@@ -26,7 +26,7 @@ const players = {
      //return state.synced
       if((state.synced!= null)&&(state.synced!=undefined))
         return Object.values(state.synced)
-          .filter(player => ( (player.last_online+120000)>Date.now()) && player.activeGame!=null)
+          .filter(player => ( (player.last_online+120000)>Date.now() && player.activeGame!=null))
           .sort((playerA, playerB) => {
           return playerB["score"] - playerA["score"]
         })
@@ -40,6 +40,14 @@ const players = {
           return state.synced[userID].last_online
         else
           return null
+      },
+      
+    // check if specific User exists
+    userExists: state => userID => {
+        if((state.synced!= null)&&(state.synced!=undefined) && userID in state.synced)
+          return true
+        else
+          return false
       }
   },
   mutations: {

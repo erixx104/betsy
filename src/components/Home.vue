@@ -114,13 +114,14 @@
       // check if user has successfully entered the game -> "has an active Game"
       userGame (value) {
         if(value){
+          
+          //close connection to games overview
+          this.$store.dispatch('games/closeDBChannel')
+          
           console.log("Let's go inside.....")
-          this.$store.dispatch('enterGame').catch((error) => {console.log('enterGameError: '+error);console.log("Zonk!!")}).then(() => {
-            console.log("That worked, GO!")
-            this.$router.push({ path: `/MyGame` })  
-          })
+          this.$router.push({ path: `/MyGame` })  
+          
         }
-        //this.$store.dispatch('loaderOff')
       }
     }
   }
