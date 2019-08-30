@@ -31,7 +31,18 @@ const bets = {
           .sort((betA, betB) => { return betA["createdAt"] - betB["createdAt"] })
       else
         return null
-    }, 
+    },
+    
+    bet: state => betID => {
+      console.log(betID)
+      console.log(state.synced)
+      console.log(state.synced[betID])
+      if( (state.synced!= null) && (state.synced!=undefined) && (betID in state.synced))
+        return state.synced[betID]
+      else
+        return null
+      
+    }
   },
   mutations: {},
   actions: {},

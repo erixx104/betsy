@@ -122,7 +122,7 @@
           this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
           
         this.watchdog()
-        this.watchdogInterval = setInterval(() => {this.watchdog()}, 10000)
+        this.watchdogInterval = setInterval(() => {this.watchdog()}, 1000)
 
       }      
 
