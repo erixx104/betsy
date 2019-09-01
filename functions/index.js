@@ -1,35 +1,82 @@
 
 'use strict';
 
-// [START all]
-// [START import]
 // The Cloud Functions for Firebase SDK to create Cloud Functions and setup triggers.
 const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access the Cloud Firestore.
 const admin = require('firebase-admin');
+
+const _ = require('lodash');
+
 admin.initializeApp();
-// [END import]
 
 
 
-// [START makeUppercase]
-// Listens for new messages added to /messages/:documentId/original and creates an
-// uppercase version of the message to /messages/:documentId/uppercase
-// [START makeUppercaseTrigger]
 exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}')
     .onWrite((snap, context) => {
-// [END makeUppercaseTrigger]
-      // [START makeUppercaseBody]
-      // Grab the current value of what was written to the Cloud Firestore.
+        
+      //console.log(context.params.gameId, context.params.betId);
+      //console.log(snap.after.data())
       
-      console.log(context.params.gameId, context.params.betId);
-      console.log(snap.after.data())
-      // You must return a Promise when performing asynchronous tasks inside a Functions such as
-      // writing to the Cloud Firestore.
-      // Setting an 'uppercase' field in the Cloud Firestore document returns a Promise.
+      if(snap.after.data().state === "running"){
+
+        const minEqualVerdicts = Math.ceil(Object.keys(snap.after.data().selection).length*0.51)
+        console.log("minEqualVerdicts: "+minEqualVerdicts)
+        
+        var result = null
+        var winner = null
+        
+        // if there are already any verdicts...
+        if("verdicts" in snap.after.data()){
+            var verdicts = _.invertBy(Object.assign({}, snap.after.data().verdicts))
+
+
+            // is there any verdict, which occurs the minimal amount of times? (minEqualVerdicts) -> store result and winner
+            for (let [key, value] of Object.entries(verdicts)) {
+              //console.log(`${key} :-> ${value.length}`);
+              if(value.length>=minEqualVerdicts){
+                  result = key
+                  winner = value
+              }
+            }
+            
+            // if there is a result (= a winner) ...
+            if(result){
+                console.log('Majority-vote: '+result)
+                console.log('Winner: '+winner)
+                
+                // calculate overall Pot (sum of all wagers)
+                var potSize = Object.values(snap.after.data().wager).reduce((a, b) => a + b);
+                console.log('Overall pot: '+potSize)
+                
+                // calculate sum of winner wager
+                var winnerWager = Object.values(_.pick(snap.after.data().wager, winner)).reduce((a, b) => a + b)
+                
+                console.log('Winner wager: '+winnerWager)
+                
+                // create winner object, by filtering wager to only winner and then calculate the win
+                var winnerObj = _.mapValues(_.pick(snap.after.data().wager,winner), (o) => Math.ceil(o/winnerWager*potSize) )
+                
+                console.log( winnerObj )
+                
+                //write WinnerObj & set State
+                snap.after.ref.set({
+                    winner: winnerObj,
+                    state: 'over',
+                  }, {merge: true})
+                  
+                // jetzt NURNOCH Gewinn verrechnen...
+                
+                
+            }else
+                console.log('no majority vote yet..')
+        }
+        
+      }else{
+        console.log("no active bet changed")
+      }
+
       return true // snap.ref.set({uppercase}, {merge: true});
-      // [END makeUppercaseBody]
+
     });
-// [END makeUppercase]
-// [END all]
