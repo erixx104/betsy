@@ -15,21 +15,65 @@ admin.initializeApp();
 
 exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}')
     .onWrite((snap, context) => {
-        
-      //console.log(context.params.gameId, context.params.betId);
-      //console.log(snap.after.data())
       
+      // ---------------------------- BET-Spectation when switching from "request" to "declined": transfer back scores   ------------- //
+      if(snap.before.data().state === "requested" && snap.after.data().state === "declined"){
+        let selections=Object.values(snap.after.data().selection)
+        
+        console.log("bet was not accepted (declined) - scores will be transferred back")
+
+        // transfer back game score corresponding to "wager"-Object
+        for (let [key, value] of Object.entries(snap.after.data().wager)) {
+          admin.firestore().collection('games').doc(context.params.gameId)
+                           .collection('players').doc(key)
+                              .update({"score" : admin.firestore.FieldValue.increment(value)})  
+        }
+          
+          
+        return true
+
+      }
+      
+      
+      // ---------------------------- BET-Spectation when switching from "request" to "running": same selections? stop bet   ------------- //
+      if(snap.before.data().state === "requested" && snap.after.data().state === "running"){
+        let selections=Object.values(snap.after.data().selection)
+        
+        console.log(selections)
+        console.log("Different selections: "+_.uniq(selections).length)
+        
+        // if there are no different selections (all picked the same -> transfer back score and stop bet -> State = "agreed")
+        if(_.uniq(selections).length === 1){
+          
+          // transfer back game score corresponding to "wager"-Object
+          for (let [key, value] of Object.entries(snap.after.data().wager)) {
+            admin.firestore().collection('games').doc(context.params.gameId)
+                             .collection('players').doc(key)
+                                .update({"score" : admin.firestore.FieldValue.increment(value)})  
+          }
+          
+          
+          //write WinnerObj & set State
+          snap.after.ref.set({
+              state: 'agreed',
+            }, {merge: true})
+          return true
+        }
+      }
+        
+
+      // ---------------------------- BET-Spectation while "running": is bet sufficiently resolved??       ------------- //
       if(snap.after.data().state === "running"){
 
         const minEqualVerdicts = Math.ceil(Object.keys(snap.after.data().selection).length*0.51)
         console.log("minEqualVerdicts: "+minEqualVerdicts)
         
-        var result = null
-        var winner = null
+        let result = null
+        let winner = null
         
         // if there are already any verdicts...
         if("verdict" in snap.after.data()){
-            var verdicts = _.invertBy(Object.assign({}, snap.after.data().verdict))
+            let verdicts = _.invertBy(Object.assign({}, snap.after.data().verdict))
 
 
             // is there any verdict, which occurs the minimal amount of times? (minEqualVerdicts) -> store result and winner
@@ -47,16 +91,16 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
                 console.log('Winner: '+winner)
                 
                 // calculate overall Pot (sum of all wagers)
-                var potSize = Object.values(snap.after.data().wager).reduce((a, b) => a + b);
+                let potSize = Object.values(snap.after.data().wager).reduce((a, b) => a + b);
                 console.log('Overall pot: '+potSize)
                 
                 // calculate sum of winner wager
-                var winnerWager = Object.values(_.pick(snap.after.data().wager, winner)).reduce((a, b) => a + b)
+                let winnerWager = Object.values(_.pick(snap.after.data().wager, winner)).reduce((a, b) => a + b)
                 
                 console.log('Winner wager: '+winnerWager)
                 
                 // create winner object, by filtering wager to only winner and then calculate the win
-                var winnerObj = _.mapValues(_.pick(snap.after.data().wager,winner), (o) => Math.ceil(o/winnerWager*potSize) )
+                let winnerObj = _.mapValues(_.pick(snap.after.data().wager,winner), (o) => Math.ceil(o/winnerWager*potSize) )
                 
                 console.log( winnerObj )
                 
@@ -68,8 +112,9 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
                   
                 // recalculate game-scores corresponding to winnerObj
                 for (let [key, value] of Object.entries(winnerObj)) {
-                  admin.firestore().collection('games').doc(context.params.gameId).collection('players').doc(key)
-                    .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                  admin.firestore().collection('games').doc(context.params.gameId)
+                                   .collection('players').doc(key)
+                                      .update({"score" : admin.firestore.FieldValue.increment(value)})  
                 }
                 
                 

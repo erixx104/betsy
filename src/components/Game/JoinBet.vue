@@ -82,7 +82,7 @@
                 .catch(console.error)
                 .then(() =>{
                     this.dialog = false
-                    this.$store.dispatch('players/addUserScore', {user: this.$store.getters.userID, score: -this.bet})
+                    this.$store.dispatch('addUserScore', {user: this.$store.getters.userID, score: -this.bet})
   
                 })
                   

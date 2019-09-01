@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VuexEasyFirestore from 'vuex-easy-firestore'
+import { increment } from 'vuex-easy-firestore'
 import { Firebase, initFirebase } from './config/firebase.js'
 import games from './stores/games.js'
 import bets from './stores/bets.js'
@@ -39,7 +40,7 @@ const storeData = {
   },
   
   actions: {
-
+    
     enterGame({state,dispatch}) {
       return new Promise((resolve, reject) => {
         if((state.user.activeGame != '' && state.user.activeGame != null && state.user.activeGame != undefined)){
@@ -97,7 +98,7 @@ const storeData = {
                     })
     },
     
-    registerUser ({commit}, payload) {
+    registerUser ({commit, dispatch}, payload) {
       Firebase.auth().signInAnonymously()
       .then(
           result => {
@@ -118,11 +119,15 @@ const storeData = {
             console.log(result.user.uid)
             Firebase.database().ref('/users/' + newUser.id).set(newUser)
             commit('setUser', newUser)
+            
+            dispatch('players/setPathVars', {gameID: payload.gameID})
+            dispatch('players/insert', Object.assign(newUser, {score:10, last_online:Date.now()}))
           }
         )
       .catch(
         error => { console.log(error) }
         )
+      
     },
     
     setUser(context, user){
@@ -135,7 +140,11 @@ const storeData = {
     
     loaderOff({commit}){
       commit('setLoader', false)
-    }
+    },
+    
+    addUserScore({dispatch}, payload){
+      dispatch('players/patch', {id: payload.user, score: increment(payload.score)})
+    },
 
   },
   getters: {

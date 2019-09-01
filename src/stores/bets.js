@@ -34,9 +34,6 @@ const bets = {
     },
     
     bet: state => betID => {
-      console.log(betID)
-      console.log(state.synced)
-      console.log(state.synced[betID])
       if( (state.synced!= null) && (state.synced!=undefined) && (betID in state.synced))
         return state.synced[betID]
       else

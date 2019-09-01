@@ -61,21 +61,8 @@
               this.dialog = false
               this.userAnswer = null
               this.valid = true
-              /*
-              // if enough verdicts available --> Judge
-              //100*(runningBet.nVerdicts/Math.ceil(Object.keys(this.$store.content.wager).length*0.51))
-              var bet = this.$store.getters['bets/bet'](this.content.id)
-              
-              var minEqualVerdicts = Math.ceil(Object.keys(bet.wager).length*0.51)
-              const verdicts = Object.entries(bet.verdicts)
-              
-              for (const [fruit, count] of entries) {
-                console.log(`There are ${count} ${fruit}s`)
-              }
-              
-              console.log()
-                          this.$store.getters['bets/list']
-                          */
+             
+              // evaluation of verdicts is done in resolve-Bet function @server             
               
             })
 

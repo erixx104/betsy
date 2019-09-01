@@ -8,6 +8,7 @@
         
           <join-bet ref="joinBet"></join-bet>
           <resolve-bet ref="resolveBet"></resolve-bet>
+          <award-bet ref="awardBet"></award-bet>
           <new-bet class="mb-6"></new-bet>
           
           <v-subheader v-if="(this.requestedBets.length)">Angebotene Wetten</v-subheader>
@@ -85,6 +86,7 @@
   import NewBet from './NewBet.vue'
   import JoinBet from './JoinBet.vue'
   import ResolveBet from './ResolveBet.vue'
+  import AwardBet from './AwardBet.vue'
   import Scoreboard from './Scoreboard.vue'
 
   export default {
@@ -100,8 +102,18 @@
          'new-bet':NewBet,
          'join-bet':JoinBet,
          'resolve-bet':ResolveBet,
+         'award-bet':AwardBet,
          'scoreboard':Scoreboard
      },
+     
+     beforeCreate() {
+        this.$store.dispatch('loaderOn') 
+     },
+     
+     mounted() {
+        setTimeout(() => {this.$store.dispatch('loaderOff'), 1000})      
+     },
+    
     created() {
       //if no active Game found -> redirect to the home menu
       if( !this.$store.getters.activeGame ){
@@ -118,8 +130,10 @@
         
         //if current user is not part of the game (not in the players list) -> add current user
         console.log("check if user is already part of the game...")
-        if(! (this.$store.getters.userID in this.$store.getters['players/userExists']) )
-          this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
+        if(! (this.$store.getters.userID in this.$store.getters['players/userExists']) ){
+          //this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
+          //console.log("player added...")
+        }
           
         this.watchdog()
         this.watchdogInterval = setInterval(() => {this.watchdog()}, 1000)
@@ -151,8 +165,8 @@
       watchdog () {
         
         //Workaround: if current user is not part of the game (not in the players list) -> add current user
-        if(!this.$store.getters['players/userExists'](this.$store.getters.userID))      
-          this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
+        //if(!this.$store.getters['players/userExists'](this.$store.getters.userID))      
+        //  this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
         //////
         
         if(((Date.now()-this.$store.getters['players/getUserLastOn'](this.$store.getters.userID)) / 1000) > 30){
@@ -279,7 +293,7 @@
       },
       
       activeStateBetsGetter() {
-        this.playSound(require('@/assets/sound5.mp3'))
+        //this.playSound(require('@/assets/sound5.mp3'))
         this.watchdog()
       },
       

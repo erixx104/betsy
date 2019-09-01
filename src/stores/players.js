@@ -53,10 +53,6 @@ const players = {
   mutations: {
     reset (state) {
       state.synced=null
-    },
-    
-    addUserScore (state, payload) {
-      state.synced[payload.user].score+=payload.score       
     }
   },
   actions: {
@@ -64,9 +60,7 @@ const players = {
       commit('reset')
     },
     
-    addUserScore({commit}, payload){
-      commit('addUserScore', payload);
-    },
+
 
   }
   

@@ -70,6 +70,14 @@
       ]
     }),
     
+     beforeCreate() {
+        this.$store.dispatch('loaderOn') 
+     },
+     
+     mounted() {
+        setTimeout(() => {this.$store.dispatch('loaderOff'), 1000})      
+     },    
+    
     created() {
       // sync active games for entering
       this.$store.dispatch('games/openDBChannel',{where: [['active','==',true]]}).catch(console.error)
@@ -117,6 +125,8 @@
           
           //close connection to games overview
           this.$store.dispatch('games/closeDBChannel')
+          
+          
           
           console.log("Let's go inside.....")
           this.$router.push({ path: `/MyGame` })  
