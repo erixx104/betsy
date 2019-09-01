@@ -28,8 +28,8 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
         var winner = null
         
         // if there are already any verdicts...
-        if("verdicts" in snap.after.data()){
-            var verdicts = _.invertBy(Object.assign({}, snap.after.data().verdicts))
+        if("verdict" in snap.after.data()){
+            var verdicts = _.invertBy(Object.assign({}, snap.after.data().verdict))
 
 
             // is there any verdict, which occurs the minimal amount of times? (minEqualVerdicts) -> store result and winner
@@ -66,7 +66,11 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
                     state: 'over',
                   }, {merge: true})
                   
-                // jetzt NURNOCH Gewinn verrechnen...
+                // recalculate game-scores corresponding to winnerObj
+                for (let [key, value] of Object.entries(winnerObj)) {
+                  admin.firestore().collection('games').doc(context.params.gameId).collection('players').doc(key)
+                    .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                }
                 
                 
             }else
