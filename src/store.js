@@ -119,9 +119,10 @@ const storeData = {
             console.log(result.user.uid)
             Firebase.database().ref('/users/' + newUser.id).set(newUser)
             commit('setUser', newUser)
-            
-            dispatch('players/setPathVars', {gameID: payload.gameID})
-            dispatch('players/insert', Object.assign(newUser, {score:10, last_online:Date.now()}))
+
+            dispatch('players/setPathVars',{gameID: payload.gameID})
+            dispatch('players/insert', Object.assign(newUser, {score:10, last_online:Date.now()}) )
+
           }
         )
       .catch(

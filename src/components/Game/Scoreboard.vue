@@ -23,6 +23,7 @@
               </v-list-item>
             </v-list-item-group>
           </v-list>
+          <div style="height:300px"></div>
           <v-expansion-panels class="overline ml-1 mr-1 mt-10">
             <v-expansion-panel :key="1">
               <v-expansion-panel-header class="overline">Debug Info loaded Game</v-expansion-panel-header>

@@ -16,10 +16,13 @@ admin.initializeApp();
 exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}')
     .onWrite((snap, context) => {
       
+      // ---- if BET was just created (no BEFORE exists) --> Stop here -> return
+      if(!snap.before.exists)
+        return true
+      
       // ---------------------------- BET-Spectation when switching from "request" to "declined": transfer back scores   ------------- //
       if(snap.before.data().state === "requested" && snap.after.data().state === "declined"){
-        let selections=Object.values(snap.after.data().selection)
-        
+
         console.log("bet was not accepted (declined) - scores will be transferred back")
 
         // transfer back game score corresponding to "wager"-Object
