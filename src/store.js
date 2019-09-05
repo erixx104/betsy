@@ -41,47 +41,21 @@ const storeData = {
   
   actions: {
     
-    enterGame({state,dispatch}) {
-      return new Promise((resolve, reject) => {
-        if((state.user.activeGame != '' && state.user.activeGame != null && state.user.activeGame != undefined)){
-
-          //close connection to games overview
-          dispatch('games/closeDBChannel')
-            .catch((error) => {reject("close GameDB ging nicht: "+error)})
-          
-          //open connection to game-specific players....
-          dispatch('players/openDBChannel',{gameID: state.user.activeGame})
-            .catch((error) => {reject("open Player DB ging nicht: "+error)})
-            .then(() =>{
-              //add current user
-              dispatch('players/insert', Object.assign(state.user, {score:10, last_online:Date.now()}))
-                .catch((error) => {reject("insert user in players ging nicht: "+error)})
-                .then(() =>{
-                  //...and bets overview
-                  dispatch('bets/openDBChannel',{gameID: state.user.activeGame})
-                    .catch((error) => {reject("open Bets DB ging nicht: "+error)})
-                    .then(() =>{
-                      console.log('Signed In')  
-                      resolve("läuft!")
-                })
-            })
-          })
-          
-          
-  
-          
-        }else{
-          reject("hat garnicht geklappt")
-        }
-        
-      })
-      
+    enterGame({state}) {
+      console.log("enterGame....")
+      Firebase.database().ref('/users/' + state.user.id).update({gameEntered: true}, function(error) {
+          if (error) {
+            console.error(error)// The write failed...
+          } else {
+            console.log("gut...") // Data saved successfully!
+          }
+        })
     },
     
     leaveGame({state, dispatch}) {
 
         //set 'activeGame' @ Player (in Games) to null to indicate, that the user actively left the game
-        dispatch('players/patch', {id : state.user.id, activeGame : null })
+        dispatch('players/set', {id : state.user.id, activeGame : null })
                     .catch(console.error)
                     .then(() =>{
                       
@@ -89,7 +63,6 @@ const storeData = {
                       Firebase.database().ref('/users/' + state.user.id).remove().then(() => {
                           //...then signout
                           Firebase.auth().signOut().then(function() {
-                              //commit('setUser', null)
                               console.log('Signed Out')        
                             }, function(error) {
                               console.error('Sign Out Error', error)
@@ -98,36 +71,41 @@ const storeData = {
                     })
     },
     
-    registerUser ({commit, dispatch}, payload) {
-      Firebase.auth().signInAnonymously()
-      .then(
-          result => {
-            
-            //create Avatar
-            var initials = payload.playerName.substr(0,1).toUpperCase()+payload.playerName.substr(-1).toUpperCase()
-            var randomColor = require('randomcolor') // import the script
-            var color = randomColor({luminosity: 'light'})
-            
-            const newUser = {
-              id: result.user.uid,
-              name: payload.playerName,
-              activeGame: payload.gameID,
-              initials,
-              color
-              //score: 0
-            }
-            console.log(result.user.uid)
-            Firebase.database().ref('/users/' + newUser.id).set(newUser)
-            commit('setUser', newUser)
+    registerUser ({commit}, payload) {
+      return new Promise((resolve, reject) => {
+          Firebase.auth().signInAnonymously()
+          .then(
+              result => {
+                
+                //create Avatar
+                var initials = payload.playerName.substr(0,1).toUpperCase()+payload.playerName.substr(-1).toUpperCase()
+                var randomColor = require('randomcolor') // import the script
+                var color = randomColor({luminosity: 'light'})
+                
+                const newUser = {
+                  id: result.user.uid,
+                  name: payload.playerName,
+                  activeGame: payload.gameID,
+                  initials,
+                  color,
+                  //gameEntered : false
+                }
+                console.log(result.user.uid)
+                Firebase.database().ref('/users/' + newUser.id).set(newUser)
+                commit('setUser', newUser)
+    
+                console.log(payload.gameID+" | "+ newUser.id)
 
-            dispatch('players/setPathVars',{gameID: payload.gameID})
-            dispatch('players/insert', Object.assign(newUser, {score:10, last_online:Date.now()}) )
-
-          }
-        )
-      .catch(
-        error => { console.log(error) }
-        )
+                if(newUser)
+                  resolve(newUser)
+                else
+                  reject("hmpf")
+              }
+            )
+          .catch(
+              //reject("hmpf")
+            )
+      })
       
     },
     
@@ -156,6 +134,10 @@ const storeData = {
         return state.user.activeGame
       else
         return null
+    },
+    
+    gameEntered (state) {
+      return "user" in state && "gameEntered" in state.user && state.user.gameEntered
     },
     
     // return user object

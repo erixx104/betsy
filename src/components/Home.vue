@@ -57,6 +57,7 @@
   export default {
     data: () => ({
       valid: true,
+      started: false,
       NameDialog: false,
       playerName: '',
       playerNameRules: [
@@ -80,23 +81,38 @@
     
     created() {
       // sync active games for entering
-      this.$store.dispatch('games/openDBChannel',{where: [['active','==',true]]}).catch(console.error)
+      this.startup()
     },
 
     methods: {
-      enterGameButton () {
+      async startup() {
+        await this.$store.dispatch('games/openDBChannel',{where: [['active','==',true]]}).catch(console.error)
+        this.started = true
+        this.$store.dispatch('loaderOff') 
+      },
+      
+      async enterGameButton () {
         if (this.$refs.form.validate()) {
-          if(this.$store.dispatch('registerUser', {gameID: this.$store.getters['games/getIdForLink'](this.gameID), playerName:this.playerName})){  
-            console.log(this.$store.getters.user)
-          }else{
-            console.log('Huuups, da ist was schief gelaufen')
+          
+          
+          try {
+            this.$store.dispatch('loaderOn') 
+            await this.$store.dispatch('players/closeDBChannel', {clearModule: true})
+            await this.$store.dispatch('players/setPathVars',{gameID: this.$store.getters['games/getIdForLink'](this.gameID)})
+            const newUser = await this.$store.dispatch('registerUser', {gameID: this.$store.getters['games/getIdForLink'](this.gameID), playerName:this.playerName})
+            console.log("--------------")
+            console.log(newUser)
+            await this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}) )
+            this.$store.dispatch('enterGame')
+            this.$store.dispatch('loaderOff')
+          } catch (e) {
+            console.log(e)
           }
           
         }
       },
       checkGameId(value) {
         if(value.length==5){
-          //if(this.$store.getters.loadedGames.find(function(element){return element.id==value}))
           if(this.$store.getters['games/gameExists'](value))
             return true
           else
@@ -108,7 +124,7 @@
     },
     computed: {
       userGame () {
-        return this.$store.getters.activeGame
+        return this.$store.getters.activeGame && this.$store.getters.gameEntered && this.started
       }
     },
     watch: {
@@ -125,9 +141,7 @@
           
           //close connection to games overview
           this.$store.dispatch('games/closeDBChannel')
-          
-          
-          
+
           console.log("Let's go inside.....")
           this.$router.push({ path: `/MyGame` })  
           
@@ -135,4 +149,5 @@
       }
     }
   }
+
 </script>

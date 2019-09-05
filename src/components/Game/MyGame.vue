@@ -8,7 +8,6 @@
         
           <join-bet ref="joinBet"></join-bet>
           <resolve-bet ref="resolveBet"></resolve-bet>
-          <award-bet ref="awardBet"></award-bet>
           <new-bet class="mb-6"></new-bet>
           
           <v-subheader v-if="(this.requestedBets.length)">Angebotene Wetten</v-subheader>
@@ -96,6 +95,7 @@
       requestedBets : [],
       runningBets : [],
       watchdogInterval : null,
+      started : false
       
     }),
     components:{
@@ -106,40 +106,22 @@
          'scoreboard':Scoreboard
      },
      
-     beforeCreate() {
+     beforeCreate () {
         this.$store.dispatch('loaderOn') 
      },
-     
-     mounted() {
-        setTimeout(() => {this.$store.dispatch('loaderOff'), 1000})      
-     },
-    
-    created() {
+
+    created () {
       //if no active Game found -> redirect to the home menu
-      if( !this.$store.getters.activeGame ){
+     /* if( !this.$store.getters.activeGame ){
         console.log('No active Game. Redirect to home')
-        this.$router.push({ path: `/` })
+        //this.$router.push({ path: `/` })
       }else{
-      
-        console.log("Active Game detected -> let's start up the database connections")
-        //open connection to game-specific bets....
-        this.$store.dispatch('bets/openDBChannel',{gameID: this.$store.getters.activeGame})
         
-        //open connection to game-specific players....
-        this.$store.dispatch('players/openDBChannel',{gameID: this.$store.getters.activeGame})
         
-        //if current user is not part of the game (not in the players list) -> add current user
-        console.log("check if user is already part of the game...")
-        if(! (this.$store.getters.userID in this.$store.getters['players/userExists']) ){
-          //this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
-          //console.log("player added...")
-        }
-          
-        this.watchdog()
-        this.watchdogInterval = setInterval(() => {this.watchdog()}, 1000)
+        
 
-      }      
-
+      }      */
+      this.startup()
 
     },
     
@@ -148,6 +130,20 @@
     },
     
     methods: {
+      
+      async startup () {
+        console.log("Active Game detected -> let's start up the database connections")
+        //open connection to game-specific bets....
+        await this.$store.dispatch('bets/openDBChannel',{gameID: this.$store.getters.activeGame})
+        
+        //open connection to game-specific players....
+        await this.$store.dispatch('players/openDBChannel',{gameID: this.$store.getters.activeGame})
+        console.log(this.$store.getters['players/listActive'])
+        this.watchdog()
+        this.watchdogInterval = setInterval(() => {this.watchdog()}, 1000)
+        this.started = true
+        this.$store.dispatch('loaderOff') 
+      },
       
       join (value) {
         this.$refs.joinBet.content=this.$store.getters['bets/listActiveState'].find(x => x.id==value)
@@ -164,14 +160,9 @@
       
       watchdog () {
         
-        //Workaround: if current user is not part of the game (not in the players list) -> add current user
-        //if(!this.$store.getters['players/userExists'](this.$store.getters.userID))      
-        //  this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}))
-        //////
-        
         if(((Date.now()-this.$store.getters['players/getUserLastOn'](this.$store.getters.userID)) / 1000) > 30){
           console.log("Alive! "+Date.now())
-          this.$store.dispatch('players/patch', {id : this.$store.getters.userID, last_online : Date.now() })
+          this.$store.dispatch('players/set', {id : this.$store.getters.userID, last_online : Date.now() })
             .catch(console.error)
             .then(() =>{})
         }
@@ -249,7 +240,7 @@
     
     computed: {
       userGame () {
-        return this.$store.getters.activeGame
+        return this.$store.getters.activeGame && this.started
       },
       
       userID () {
