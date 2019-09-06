@@ -37,8 +37,14 @@
     }),
 
     methods: {
-      onLeaveGame () {
-        this.$store.dispatch('leaveGame')
+      async onLeaveGame () {
+        this.$store.dispatch('loaderOn')   
+        await this.$store.dispatch('leaveGame')
+        await this.$store.dispatch('players/closeDBChannel', {clearModule: true})
+        await this.$store.dispatch('bets/closeDBChannel', {clearModule: true})
+        //this.$router.push({ path: `/` })
+        window.location.href = '/'
+         //this.$store.dispatch('loaderOff') 
       }
     }
   };

@@ -111,17 +111,9 @@
      },
 
     created () {
-      //if no active Game found -> redirect to the home menu
-     /* if( !this.$store.getters.activeGame ){
-        console.log('No active Game. Redirect to home')
-        //this.$router.push({ path: `/` })
-      }else{
-        
-        
-        
 
-      }      */
-      this.startup()
+      if(this.initialized)
+        this.startup()
 
     },
     
@@ -132,7 +124,14 @@
     methods: {
       
       async startup () {
-        console.log("Active Game detected -> let's start up the database connections")
+        
+        if(!this.$store.getters.activeGame){
+          console.log("redirect to home..")
+          this.$router.push({ path: `/` })
+          return
+        }
+        
+        console.log("Startup page..")
         //open connection to game-specific bets....
         await this.$store.dispatch('bets/openDBChannel',{gameID: this.$store.getters.activeGame})
         
@@ -239,10 +238,6 @@
     },
     
     computed: {
-      userGame () {
-        return this.$store.getters.activeGame && this.started
-      },
-      
       userID () {
         return this.$store.getters.userID
       },
@@ -263,27 +258,24 @@
         }
         
         return verdictList
+      },
+      
+      initialized () {
+        return this.$store.getters.isInitialized
       }
+      
 
     },
     
     watch: {
       
-      // check if user has a an active Game -> if not -> go to main page
-      userGame (value) {
-        if(!value){
-          
-          // close DB connections to players and bets
-          this.$store.dispatch('players/closeDBChannel', {clearModule: true})
-          this.$store.dispatch('bets/closeDBChannel', {clearModule: true})
-          
-          console.log("Let's switch to home.....")
-          this.$router.push({ path: `/` })
-        }
-        //this.$store.dispatch('loaderOff')
+      initialized (value) {
+        if(value)
+          this.startup()
       },
       
       activeStateBetsGetter() {
+        // there could have been an update on the bets -> recalculate => watchdog
         //this.playSound(require('@/assets/sound5.mp3'))
         this.watchdog()
       },

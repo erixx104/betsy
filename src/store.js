@@ -6,7 +6,6 @@ import { Firebase, initFirebase } from './config/firebase.js'
 import games from './stores/games.js'
 import bets from './stores/bets.js'
 import players from './stores/players.js'
-//import createPersistedState from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
@@ -22,7 +21,8 @@ const storeData = {
   plugins: [easyFirestore], //, createPersistedState()],
   state: {
     user: null,
-    loader : false
+    loader : false,
+    initialized : false
   },
 
   mutations: {
@@ -33,7 +33,11 @@ const storeData = {
     
     setLoader (state, payload) {
       state.loader=payload
-    }
+    },
+    
+    setInitialize(state, payload) {
+      state.initialized = payload
+    },
 
   },
   computed: {
@@ -41,34 +45,27 @@ const storeData = {
   
   actions: {
     
-    enterGame({state}) {
-      console.log("enterGame....")
-      Firebase.database().ref('/users/' + state.user.id).update({gameEntered: true}, function(error) {
-          if (error) {
-            console.error(error)// The write failed...
-          } else {
-            console.log("gut...") // Data saved successfully!
-          }
-        })
-    },
-    
     leaveGame({state, dispatch}) {
+       return new Promise((resolve, reject) => {
 
-        //set 'activeGame' @ Player (in Games) to null to indicate, that the user actively left the game
-        dispatch('players/set', {id : state.user.id, activeGame : null })
-                    .catch(console.error)
-                    .then(() =>{
-                      
-                      //...then remove active user from Firebase DB
-                      Firebase.database().ref('/users/' + state.user.id).remove().then(() => {
-                          //...then signout
-                          Firebase.auth().signOut().then(function() {
-                              console.log('Signed Out')        
-                            }, function(error) {
-                              console.error('Sign Out Error', error)
-                            });
-                      })
-                    })
+            //set 'activeGame' @ Player (in Games) to null to indicate, that the user actively left the game
+            dispatch('players/set', {id : state.user.id, activeGame : null })
+                        .catch(console.error)
+                        .then(() =>{
+                          
+                          //...then remove active user from Firebase DB
+                          Firebase.database().ref('/users/' + state.user.id).remove().then(() => {
+                              //...then signout
+                              Firebase.auth().signOut().then(function() {
+                                  console.log('Signed Out')
+                                  resolve(true)
+                                }, function(error) {
+                                  console.error('Sign Out Error', error)
+                                  reject(false)
+                                });
+                          })
+                        })
+       })
     },
     
     registerUser ({commit}, payload) {
@@ -121,6 +118,10 @@ const storeData = {
       commit('setLoader', false)
     },
     
+    setInitialized({commit}){
+      commit('setInitialize', true)
+    },
+    
     addUserScore({dispatch}, payload){
       dispatch('players/patch', {id: payload.user, score: increment(payload.score)})
     },
@@ -135,11 +136,7 @@ const storeData = {
       else
         return null
     },
-    
-    gameEntered (state) {
-      return "user" in state && "gameEntered" in state.user && state.user.gameEntered
-    },
-    
+
     // return user object
     user (state) {
       return state.user
@@ -156,6 +153,10 @@ const storeData = {
     // return loader state
     loader (state) {
       return state.loader
+    },
+    
+    isInitialized ( state ) {
+      return state.initialized
     }
     
   }
@@ -174,15 +175,18 @@ initFirebase()
   
 //When ever the user authentication state changes write the user to vuex.
 Firebase.auth().onAuthStateChanged((user) =>{
+  console.log("Initialize FB..")
   if(user){
       console.log('auth()-State: UID='+user.uid)
       Firebase.database().ref('/users/' + user.uid).on('value', function(snapshot) {
         store.dispatch('setUser', snapshot.val())
+        store.dispatch('setInitialized')
       })
       
   }else{
       console.log('auth()-State: no User')
       store.dispatch('setUser', null);
+      store.dispatch('setInitialized')
   }
 });
 

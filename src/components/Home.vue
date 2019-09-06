@@ -81,11 +81,18 @@
     
     created() {
       // sync active games for entering
-      this.startup()
+      if(this.initialized)
+        this.startup()
     },
 
     methods: {
       async startup() {
+        if(this.$store.getters.activeGame){
+          console.log("redirect to game..")
+          this.$router.push({ path: `/MyGame` })
+          return
+        }
+        
         await this.$store.dispatch('games/openDBChannel',{where: [['active','==',true]]}).catch(console.error)
         this.started = true
         this.$store.dispatch('loaderOff') 
@@ -97,14 +104,23 @@
           
           try {
             this.$store.dispatch('loaderOn') 
-            await this.$store.dispatch('players/closeDBChannel', {clearModule: true})
+
+            await this.$store.dispatch('registerUser', {gameID: this.$store.getters['games/getIdForLink'](this.gameID), playerName:this.playerName})
+
+            //await this.$store.dispatch('players/closeDBChannel', {clearModule: true})
+            //await new Promise(resolve => setTimeout(resolve, 2000)); //Timeout one-liner between async statements
+            console.log("gameID: "+this.$store.getters['games/getIdForLink'](this.gameID))
+            console.log(this.$store.state['players']._sync)
             await this.$store.dispatch('players/setPathVars',{gameID: this.$store.getters['games/getIdForLink'](this.gameID)})
-            const newUser = await this.$store.dispatch('registerUser', {gameID: this.$store.getters['games/getIdForLink'](this.gameID), playerName:this.playerName})
-            console.log("--------------")
-            console.log(newUser)
+            console.log(this.$store.state['players']._sync)
             await this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}) )
-            this.$store.dispatch('enterGame')
+
+            await this.$store.dispatch('games/closeDBChannel')
+
+            this.$router.push({ path: `/MyGame` })
+            
             this.$store.dispatch('loaderOff')
+            
           } catch (e) {
             console.log(e)
           }
@@ -123,9 +139,11 @@
       }
     },
     computed: {
-      userGame () {
-        return this.$store.getters.activeGame && this.$store.getters.gameEntered && this.started
+
+      initialized () {
+        return this.$store.getters.isInitialized
       }
+      
     },
     watch: {
       // convert Game-IDs to uppercase and A-Z0-9 only
@@ -135,18 +153,11 @@
         
       },
       
-      // check if user has successfully entered the game -> "has an active Game"
-      userGame (value) {
-        if(value){
-          
-          //close connection to games overview
-          this.$store.dispatch('games/closeDBChannel')
-
-          console.log("Let's go inside.....")
-          this.$router.push({ path: `/MyGame` })  
-          
-        }
-      }
+      initialized (value) {
+        if(value)
+          this.startup()
+      },
+      
     }
   }
 
