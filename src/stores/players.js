@@ -53,6 +53,16 @@ const players = {
       }
       
     ,
+    
+    // check if specific User exists
+    getPlayer: state => userID => {
+        if((state.synced!= null)&&(state.synced!=undefined) && userID in state.synced)
+          return state.synced[userID]
+        else
+          return false
+      }
+      
+    ,
       
     // get Score of specific User -> if doesn't exist --> null
     userScore: state => userID => {

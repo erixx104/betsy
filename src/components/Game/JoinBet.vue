@@ -92,7 +92,14 @@
         },
         
         watch: {
-   
+            // if dialog opens, reset it!
+            dialog (value) {
+              if(value==1){
+                this.bet = null
+                this.userAnswer = null
+                this.valid = true
+              }
+            },
           
         }
     }

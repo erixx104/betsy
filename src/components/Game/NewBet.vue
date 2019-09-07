@@ -1,5 +1,5 @@
 <template>
-        <v-dialog v-model="dialog" persistent max-width="600px">
+        <v-dialog v-model="dialog" persistent max-width="600px" :fullscreen="$vuetify.breakpoint.xs">
           <template v-slot:activator="{ on }">
             <v-btn color="primary" block v-on="on">Neue Wette</v-btn>
           </template>
@@ -9,20 +9,20 @@
               @submit.prevent.native="submitBet"
               lazy-validation>  
               <v-card>
-                <v-card-title>
+                <v-card-title class="mb-0 mt-0 pb-0">
                   <span class="headline">Neue Wette anbieten</span>
                 </v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-row>
-                      <v-col cols="12">
+                <v-card-text class="mb-0 mt-0 pt-0 pb-0">
+                  <v-container class="mb-0 mt-0 pt-0 pb-0">
+                    <v-row class="mb-0 mt-0 pt-0 pb-0">
+                      <v-col cols="12" class="mb-0 mt-0 pt-0 pb-0">
                         <v-text-field v-model="q" :rules="QuestionRules" label="Wette eingeben *" required></v-text-field>
                       </v-col>
-                      <v-col cols="12">
-                          <h3>Antwortmöglichkeiten:</h3>
+                      <v-col cols="12" class="mb-0 pb-0 mt-5">
+                          <h3 class="mb-0 pb-0">Antwortmöglichkeiten:</h3>
                       </v-col>
-                      <v-col cols="11" offset="1">
-                        <v-text-field :rules="AnswerRules" v-model="a[1]" label="Bitte eingeben*" required hint="Antwort 1" persistent-hint></v-text-field>
+                      <v-col cols="10" offset="1" class="mb-0 mt-0 pt-0 pb-0">
+                        <v-text-field :rules="AnswerRules" v-model="a[1]" label="Bitte eingeben*" required hint="Antwort 1" persistent-hint class="mt-3 pt-0"></v-text-field>
                         <v-text-field :rules="AnswerRules" v-model="a[2]" label="Bitte eingeben*" required hint="Antwort 2" persistent-hint></v-text-field>
                         <v-text-field v-model="a[3]" label="Bitte eingeben" hint="Antwort 3" persistent-hint></v-text-field>
                         <v-text-field v-model="a[4]" label="Bitte eingeben" hint="Antwort 4" persistent-hint></v-text-field>
@@ -35,12 +35,13 @@
                       </v-col>
                     </v-row>
                   </v-container>
-                  <small>*indicates required field</small>
+                  
                 </v-card-text>
                 <v-card-actions>
+                  <small class="mt-3 ml-3 pb-3">*indicates required field</small>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-                  <v-btn color="blue darken-1" text type="submit">Save</v-btn>
+                  <v-btn color="deep-orange accent-2" text @click="dialog = false">Close</v-btn>
+                  <v-btn color="deep-orange accent-2" text type="submit">Save</v-btn>
                 </v-card-actions>
               </v-card>
           </v-form>

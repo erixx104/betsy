@@ -2,9 +2,9 @@
   <v-container mt-0 pt-0>
          
       
-
+    <scoreboard></scoreboard>
     <v-layout>
-      <v-flex xs9 md9 mt-4 pr-3>
+      <v-flex xs12 md9 mt-4 pr-3>
         
           <award-bet ref="awardBet"></award-bet>
           <join-bet ref="joinBet"></join-bet>
@@ -13,9 +13,14 @@
           
           <v-subheader v-if="(this.requestedBets.length)">Angebotene Wetten</v-subheader>
           <v-banner class="mb-2" elevation="2" icon="mdi-alert-decagram-outline" single-line v-for="(requestedBet) in this.requestedBets" :key="requestedBet.id">
+            <span style="position:absolute;right:7px;top:2px" class="overline grey--text">Wette von {{ $store.getters['players/getPlayer'](requestedBet.created_by).name }}</span>
             <v-row>
               <v-col>
                 {{ requestedBet.q }}<!-- - {{ requestedBet.age }}s-->
+                 <ol class="body-2">
+                  <li v-for="(answer, i) in requestedBet.a" :key="i">{{ answer }}
+                  </li>
+                </ol>
               </v-col>
               <v-col>
                 <div v-if="'wager' in requestedBet">
@@ -31,7 +36,7 @@
               </v-col>
             </v-row>
             <template v-slot:actions>
-              <v-btn class="mb-1" small depressed @click="join(requestedBet.id)" v-if="!('wager' in requestedBet)||!(userID in requestedBet.wager)">
+              <v-btn class="mb-1" small color="secondary" @click="join(requestedBet.id)" v-if="!('wager' in requestedBet)||!(userID in requestedBet.wager)">
                 einsteigen
               </v-btn>
             </template>
@@ -40,6 +45,7 @@
           
           <v-subheader>Aktive Wetten</v-subheader>
           <v-banner class="mb-2" elevation="2" single-line v-for="(runningBet) in this.runningBets" :key="runningBet.id">
+            <span style="position:absolute;right:7px;top:2px" class="overline grey--text">Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}</span>
             <v-row>
               <v-col>
                 {{ runningBet.q }}
@@ -51,7 +57,7 @@
                           <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==id).color" size="10" :key="id">
                           </v-list-item-avatar> 
                         </template>
-                        <span>{{ $store.getters['players/list'].find(x => x.id==id).initials }}</span>
+                        <span>{{ $store.getters['players/list'].find(x => x.id==id).name }} - Einsatz: {{ $store.getters['bets/bet'](runningBet.id).wager[id] }} </span>
                       </v-tooltip>
                     </span>
                   </li>
@@ -64,9 +70,9 @@
             
             <template v-slot:actions>
               
-              <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.wager).length*0.51))" size="30" color="grey">{{ Math.ceil(Object.keys(runningBet.wager).length*0.51) }}</v-progress-circular>
+              <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.wager).length*0.51))" size="30" color="light-blue darken-5">{{ Math.ceil(Object.keys(runningBet.wager).length*0.51) }}</v-progress-circular>
               
-              <v-btn :disabled="!(userID in runningBet.wager)" class="mb-1" small color="secondary" @click="resolve(runningBet.id)">
+              <v-btn :disabled="!(userID in runningBet.wager)" class="mb-1" small color="light-blue darken-3" @click="resolve(runningBet.id)">
                 auflösen
               </v-btn>
 
@@ -75,9 +81,7 @@
           </v-banner>
           
       </v-flex>
-      <v-flex md3>
-        <scoreboard></scoreboard>
-      </v-flex>
+      
     </v-layout> 
   </v-container>
 </template>

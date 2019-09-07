@@ -1,9 +1,9 @@
 <template>
   <v-app>
-    <v-app-bar app>
+    <v-app-bar app class="teal darken-4">
       <v-toolbar-title class="headline text-uppercase">
         <span class="mr-2">Betsy</span>
-        <span class="font-weight-light">alpha 0.2</span>
+        <span class="font-weight-light subtitle-2">alpha 0.5</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>
@@ -12,7 +12,7 @@
           @click='onLeaveGame()'
           text>
           <v-icon small left>mdi-exit-run</v-icon>
-          Leave game
+          <span class="d-md-flex d-none">Leave game</span>
         </v-btn>
       </v-toolbar-items>
     </v-app-bar>
@@ -35,6 +35,9 @@
       
       //
     }),
+    
+    created () {
+    },
 
     methods: {
       async onLeaveGame () {
