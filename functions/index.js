@@ -48,6 +48,7 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
         // if there are no different selections (all picked the same -> transfer back score and stop bet -> State = "agreed")
         if(_.uniq(selections).length === 1){
           
+          console.log("transfer Back")
           // transfer back game score corresponding to "wager"-Object
           for (let [key, value] of Object.entries(snap.after.data().wager)) {
             admin.firestore().collection('games').doc(context.params.gameId)
@@ -60,6 +61,7 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
           snap.after.ref.set({
               state: 'agreed',
             }, {merge: true})
+            
           return true
         }
       }
@@ -150,6 +152,6 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
         console.log("no active bet changed")
       }
 
-      return true // snap.ref.set({uppercase}, {merge: true});
+      return true
 
     });
