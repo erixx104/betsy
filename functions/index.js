@@ -76,48 +76,69 @@ exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}'
         
         // if there are already any verdicts...
         if("verdict" in snap.after.data()){
-            let verdicts = _.invertBy(Object.assign({}, snap.after.data().verdict))
-
+            let verdicts  = _.invertBy(Object.assign({}, snap.after.data().verdict))
+            let selection = _.invertBy(Object.assign({}, snap.after.data().selection))
+            
+            console.log(selection)
 
             // is there any verdict, which occurs the minimal amount of times? (minEqualVerdicts) -> store result and winner
             for (let [key, value] of Object.entries(verdicts)) {
-              //console.log(`${key} :-> ${value.length}`);
               if(value.length>=minEqualVerdicts){
                   result = key
-                  winner = value
+                  winner = selection[key]
               }
             }
             
-            // if there is a result (= a winner) ...
+            // if there is a result (= a winner-answer) ...
             if(result){
                 console.log('Majority-vote: '+result)
                 console.log('Winner: '+winner)
                 
-                // calculate overall Pot (sum of all wagers)
-                let potSize = Object.values(snap.after.data().wager).reduce((a, b) => a + b);
-                console.log('Overall pot: '+potSize)
+                //if there is one or more players, which selected the winner-answer...
+                if(winner.length>=1){
                 
-                // calculate sum of winner wager
-                let winnerWager = Object.values(_.pick(snap.after.data().wager, winner)).reduce((a, b) => a + b)
-                
-                console.log('Winner wager: '+winnerWager)
-                
-                // create winner object, by filtering wager to only winner and then calculate the win
-                let winnerObj = _.mapValues(_.pick(snap.after.data().wager,winner), (o) => Math.ceil(o/winnerWager*potSize) )
-                
-                console.log( winnerObj )
-                
-                //write WinnerObj & set State
-                snap.after.ref.set({
-                    winner: winnerObj,
-                    state: 'over',
-                  }, {merge: true})
-                  
-                // recalculate game-scores corresponding to winnerObj
-                for (let [key, value] of Object.entries(winnerObj)) {
-                  admin.firestore().collection('games').doc(context.params.gameId)
-                                   .collection('players').doc(key)
-                                      .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                    // calculate overall Pot (sum of all wagers)
+                    let potSize = Object.values(snap.after.data().wager).reduce((a, b) => a + b);
+                    console.log('Overall pot: '+potSize)
+                    
+                    // calculate sum of winner wager
+                    let winnerWager = Object.values(_.pick(snap.after.data().wager, winner)).reduce((a, b) => a + b)
+                    
+                    console.log('Winner wager: '+winnerWager)
+                    
+                    // create winner object, by filtering wager to only winner and then calculate the win
+                    let winnerObj = _.mapValues(_.pick(snap.after.data().wager,winner), (o) => Math.ceil(o/winnerWager*potSize) )
+                    
+                    console.log( winnerObj )
+                    
+                    //write WinnerObj & set State
+                    snap.after.ref.set({
+                        winnerAnswer: result,
+                        winner: winnerObj,
+                        state: 'winner',
+                      }, {merge: true})
+                      
+                    // recalculate game-scores corresponding to winnerObj
+                    for (let [key, value] of Object.entries(winnerObj)) {
+                      admin.firestore().collection('games').doc(context.params.gameId)
+                                       .collection('players').doc(key)
+                                          .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                    }
+                }else{
+                    // if no player picked the winner-answer
+                    
+                    //write WinnerObj & set State
+                    snap.after.ref.set({
+                        winnerAnswer: result,
+                        state: 'noWinner',
+                      }, {merge: true})
+                      
+                    // transfer back game score corresponding to "wager"-Object
+                    for (let [key, value] of Object.entries(snap.after.data().wager)) {
+                      admin.firestore().collection('games').doc(context.params.gameId)
+                                       .collection('players').doc(key)
+                                          .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                    }
                 }
                 
                 

@@ -6,6 +6,7 @@
     <v-layout>
       <v-flex xs9 md9 mt-4 pr-3>
         
+          <award-bet ref="awardBet"></award-bet>
           <join-bet ref="joinBet"></join-bet>
           <resolve-bet ref="resolveBet"></resolve-bet>
           <new-bet class="mb-6"></new-bet>
@@ -161,7 +162,7 @@
         
         if(((Date.now()-this.$store.getters['players/getUserLastOn'](this.$store.getters.userID)) / 1000) > 30){
           console.log("Alive! "+Date.now())
-          this.$store.dispatch('players/set', {id : this.$store.getters.userID, last_online : Date.now() })
+          this.$store.dispatch('players/patch', {id : this.$store.getters.userID, last_online : Date.now() })
             .catch(console.error)
             .then(() =>{})
         }
