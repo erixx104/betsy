@@ -36,7 +36,6 @@
                   step="5"
                   min="5"
                   max="25"
-                  ticks
                   :tick-labels=[5,10,15,20,25]
                   ticks="always"
                   color="deep-orange"

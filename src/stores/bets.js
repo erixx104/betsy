@@ -33,6 +33,16 @@ const bets = {
         return null
     },
     
+    listFinishState (state) {
+     //return state.synced
+      if( (state.synced!= null) && (state.synced!=undefined) )
+        return Object.values(state.synced)
+          .filter(bet => (bet.state=="winner"||bet.state=="agreed"||bet.state=="noWinner") )
+          .sort((betA, betB) => { return betA["createdAt"] - betB["createdAt"] })
+      else
+        return null
+    },
+    
     bet: state => betID => {
       if( (state.synced!= null) && (state.synced!=undefined) && (betID in state.synced))
         return state.synced[betID]

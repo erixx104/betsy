@@ -1,7 +1,7 @@
 <template>
   <v-container mt-0 pt-0>
          
-      
+    <h1 v-if="$store.getters['games/getTitle']($store.getters.activeGame) && 0">{{ $store.getters['games/getTitle']($store.getters.activeGame) }}</h1>
     <scoreboard></scoreboard>
     <v-layout>
       <v-flex xs12 md9 mt-4 pr-3>

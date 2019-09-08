@@ -36,6 +36,14 @@ const games = {
                 return key
         }
         return false    
+    },
+    
+    //retrieve Title for specific link
+    getTitle: (state) => (link) => {
+        if ( ('synced' in state) && (link in state.synced) && ('title' in state.synced[link]) )
+            return state.synced[link].title
+        else
+            return null
     }
   },
   mutations: {},
