@@ -230,7 +230,7 @@
         this.requestedBets = []
         this.runningBets = []
         
-        const betTime = 60
+        const betTime = 40
         var age = null
         var betCreated = null
         
