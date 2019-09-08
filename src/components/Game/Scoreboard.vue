@@ -66,12 +66,11 @@
           color="secondary"
                 dark
                 small
-                absolute
-                top
+                fixed
                 left
                 fab
           @click.stop="drawer = !drawer"
-          style="z-index:10" class="mt-1"
+          style="z-index:10;top:36px" class="mt-1"
         >
           <v-icon>mdi-view-headline</v-icon>
         </v-btn>
@@ -80,8 +79,9 @@
     
     <v-navigation-drawer class="d-flex d-md-none teal lighten-5" light
        v-model="drawer"
-        absolute
+        fixed
         temporary
+        style="top:57px"
           >
 
          <v-list disabled>

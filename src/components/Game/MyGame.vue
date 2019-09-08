@@ -120,9 +120,8 @@
             </v-card-text>
 
             <v-card-actions class="d-flex d-sm-none" >
-              <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.wager).length*0.51))" size="30" color="light-blue darken-5" :class="Object.keys(runningBet.wager).length>0?'':'deep-orange--text text--accent-2'">{{ Math.ceil(Object.keys(runningBet.wager).length*0.51) }}</v-progress-circular>
-              <v-btn :disabled="!(userID in runningBet.wager)" class="mb-1" small color="light-blue darken-3" :class="Object.keys(runningBet.wager).length>0?'':'deep-orange accent-3'" @click="resolve(runningBet.id)">
-                auflösen
+              <v-btn :disabled="!(userID in runningBet.wager)" class="mb-1" small outlined block color="light-blue darken-3" :class="Object.keys(runningBet.wager).length>0?'':'deep-orange accent-3'" @click="resolve(runningBet.id)">
+                auflösen ({{runningBet.nVerdicts?runningBet.nVerdicts:0}}/{{(Object.keys(runningBet.wager).length)}})
               </v-btn>
             </v-card-actions>
 

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="600px">
+  <v-dialog v-model="dialog" persistent max-width="600px" :fullscreen="$vuetify.breakpoint.xs">
     <v-form
         ref="resolveForm"
         v-model="valid"
@@ -29,8 +29,8 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="dialog = false">Abbrechen</v-btn>
-            <v-btn color="blue darken-1" text type="submit">OK</v-btn>
+            <v-btn color="deep-orange accent-2" text @click="dialog = false">Abbrechen</v-btn>
+            <v-btn color="deep-orange accent-2" text type="submit">OK</v-btn>
           </v-card-actions>
         </v-card>
     </v-form>

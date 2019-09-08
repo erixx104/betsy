@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="dialog" persistent max-width="600px">
+  <v-dialog v-model="dialog" persistent max-width="600px" :fullscreen="$vuetify.breakpoint.xs">
     <v-form
         ref="joinBetForm"
         v-model="valid"
@@ -37,6 +37,10 @@
                   min="5"
                   max="25"
                   ticks
+                  :tick-labels=[5,10,15,20,25]
+                  ticks="always"
+                  color="deep-orange"
+                  tick-size="4"
                    class="pl-2 pr-2"
                     ></v-slider>
               </v-row>
@@ -44,8 +48,8 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="dialog = false">Close</v-btn>
-            <v-btn color="blue darken-1" text type="submit">Save</v-btn>
+            <v-btn color="deep-orange accent-2" text @click="dialog = false">Close</v-btn>
+            <v-btn color="deep-orange accent-2" text type="submit">Save</v-btn>
           </v-card-actions>
         </v-card>
     </v-form>
@@ -60,7 +64,7 @@
             dialog: false,
             valid: true,
             userAnswer : null,
-            bet : null,
+            bet : 10,
             AnswerRules: [
                 v => v!=null || 'Antwortmöglichkeit auswählen',
               ],
@@ -95,7 +99,7 @@
             // if dialog opens, reset it!
             dialog (value) {
               if(value==1){
-                this.bet = null
+                this.bet = 10
                 this.userAnswer = null
                 this.valid = true
               }
