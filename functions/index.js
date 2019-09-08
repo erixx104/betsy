@@ -13,8 +13,8 @@ admin.initializeApp();
 
 
 
-exports.resolveBet = functions.firestore.document('/games/{gameId}/bets/{betId}')
-    .onWrite((snap, context) => {
+exports.resolveBet = functions.region('europe-west1')
+    .firestore.document('/games/{gameId}/bets/{betId}').onWrite((snap, context) => {
       
       // ---- if BET was just created (no BEFORE exists) --> Stop here -> return
       if(!snap.before.exists)

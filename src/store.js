@@ -77,7 +77,7 @@ const storeData = {
                 //create Avatar
                 var initials = payload.playerName.substr(0,1).toUpperCase()+payload.playerName.substr(-1).toUpperCase()
                 var randomColor = require('randomcolor') // import the script
-                var color = randomColor({luminosity: 'dark'})
+                var color = randomColor({luminosity: 'light'})
                 
                 const newUser = {
                   id: result.user.uid,
@@ -143,7 +143,7 @@ const storeData = {
     },
     
     isAdmin (state) {
-      if ('admin' in state.user)
+      if ( (state.user != null) && (state.user != undefined) && ('admin' in state.user) )
         return true
       else
         return false
