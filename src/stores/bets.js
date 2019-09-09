@@ -15,9 +15,7 @@ const bets = {
     list (state) {
      //return state.synced
       if((state.synced!= null)&&(state.synced!=undefined))
-        return Object.values(state.synced).sort((betA, betB) => {
-          return betB["createdAt"] - betA["createdAt"]
-        })
+        return Object.values(state.synced).sort((betA, betB) => betB.created_at - betA.created_at)
       else
         return null
     },

@@ -3,7 +3,7 @@
     <v-app-bar app class="teal darken-4">
       <v-toolbar-title class="headline text-uppercase">
         <span class="mr-2">Betsy</span>
-        <span class="font-weight-light subtitle-2">alpha 0.5</span>
+        <span class="font-weight-light subtitle-2">alpha 0.6</span>
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-toolbar-items>

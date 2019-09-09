@@ -126,7 +126,64 @@
             </v-card-actions>
 
           </v-card>
+          
+          
+          <v-subheader>Abgeschlossene Wetten</v-subheader>
           <!-- ------------------------------------------------------------------------------------------------------------------------------------------->
+          <v-card
+              v-for="(finishedBet) in this.finishedBets" :key="finishedBet.id"
+              class="mb-6"  outlined style="background-color: transparent!important;opacity:0.7"
+            >
+            <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}</span>
+            <v-card-title class="teal--text text--lighten-3">
+              {{ finishedBet.q }}
+            </v-card-title>
+      
+            <v-card-text class="white--text d-flex flex-row justify-space-between">
+              <div class="d-flex">
+                <v-container class="mb-0 mt-0 pb-0 pt-0">
+                  <v-row class="mb-0 mt-0 pb-0 pt-0">
+                    <ol class="body-1 white--text">
+                      <li v-for="(answer, i) in finishedBet.a" :key="i" :style="(('winnerAnswer' in finishedBet) && (i==finishedBet.winnerAnswer))?'font-weight:bolder;color:#fff':'font-weight:lighter;color:#ccc'" class="mt-1 mb-1">{{ answer }}
+                        <span v-for="(value, id) in finishedBet.selection" :key="id">
+                          <v-tooltip bottom v-if="value==i">
+                            <template v-slot:activator="{ on }">
+                              <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==id).color" size="10" :key="id">
+                              </v-list-item-avatar> 
+                            </template>
+                            <span>{{ $store.getters['players/list'].find(x => x.id==id).name }} - Einsatz: {{ $store.getters['bets/bet'](finishedBet.id).wager[id] }} </span>
+                          </v-tooltip>
+                        </span>
+                      </li>
+                    </ol>
+                  </v-row>
+                  <v-row class="mt-2">
+                    <div v-if="finishedBet.state=='declined'">
+                      Wette wurde nicht angenommen
+                    </div>
+                    <div v-if="finishedBet.state=='agreed'">
+                      Alle haben das gleiche getippt
+                    </div>
+                    <div v-if="finishedBet.state=='noWinner'">
+                      Keiner hatte die richtige Antwort
+                    </div>
+                    <div v-if="finishedBet.state=='winner'">
+                      Gewinner: <span v-for="(wager, name) in finishedBet.winner" :key="name">{{ $store.getters['players/getPlayer'](name).name }}&nbsp;</span>
+                    </div>
+                  </v-row>
+                </v-container>
+              </div>
+              
+              <div class="flex-column justify-center align-end d-sm-flex d-none">
+                <div class="d-block justify-center">
+                  <div style="right:7px;top:2px" class="d-block mb-1 overline grey--text text-center">
+                    Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}
+                  </div>
+                </div>
+              </div>
+            </v-card-text>
+          </v-card>
+          
       </v-flex>
       
     </v-layout> 
@@ -146,6 +203,7 @@
       now : Date.now(),
       requestedBets : [],
       runningBets : [],
+      finishedBets : [],
       watchdogInterval : null,
       started : false
       
@@ -229,6 +287,7 @@
         
         this.requestedBets = []
         this.runningBets = []
+        this.finishedBets = []
         
         const betTime = 40
         var age = null
@@ -261,7 +320,7 @@
         }
         
         // sort bets in active, requested bets
-        for(bet of this.$store.getters['bets/listActiveState']){
+        for(bet of this.$store.getters['bets/list']){
           
           //hack for different timestamp format directly after insert and on receive
           if("seconds" in bet.created_at && (bet.created_at.seconds!=null || bet.created_at.seconds!=undefined))
@@ -270,6 +329,7 @@
             betCreated=Date.parse(bet.created_at)/1000
             
           age=(Math.round(Date.now()/ 1000)-betCreated)
+          
           if(bet.state=="requested"){
             
             var pbWidth = Math.max(betTime-age,0)/betTime*100
@@ -285,7 +345,9 @@
           else if(bet.state=="running"){
             this.runningBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds), nVerdicts: ("verdict" in bet)?Object.keys(bet.verdict).length:null }))
           }
-          else
+          else if(bet.state=="declined" || bet.state=="winner" || bet.state=="noWinner" || bet.state=="agreed"){
+            this.finishedBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds), nVerdicts: ("verdict" in bet)?Object.keys(bet.verdict).length:null }))
+          }else
             console.log("That shouldn't happen: "+bet)
         }
       },
