@@ -6,6 +6,12 @@ const bets = {
   moduleName: 'bets',
   statePropName: 'synced',
   namespaced: true, // automatically added
+  serverChange: {
+    convertTimestamps: {
+      updated_at: '%convertTimestamp%',
+      created_at: '%convertTimestamp%',
+    },
+  },
 
   // this object is your store module (will be added as '/games')
   // you can also add state/getters/mutations/actions
@@ -15,7 +21,14 @@ const bets = {
     list (state) {
      //return state.synced
       if((state.synced!= null)&&(state.synced!=undefined))
-        return Object.values(state.synced).sort((betA, betB) => betB.created_at - betA.created_at)
+        return Object.values(state.synced).sort(function (a, b) {
+        if (a.created_at === undefined || b.created_at === undefined) {
+          console.log('a → ', a.created_at)
+          console.log('b → ', b.created_at)
+          return a
+        }
+        return b.created_at - a.created_at
+      })
       else
         return null
     },

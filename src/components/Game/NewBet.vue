@@ -83,7 +83,8 @@
                 const bet = {
                     q : this.q,
                     a : cleanedA,
-                    state : 'requested'
+                    state : 'requested',
+                    created_at : Date.now()
                 }
                 
                 console.log(bet)

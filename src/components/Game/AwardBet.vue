@@ -38,7 +38,7 @@
     export default{
         data: () => ({
             dialog : false,
-            dc : []
+            dc : [] //dialog content
         }),
         created (){
 
@@ -50,7 +50,7 @@
         computed: {
           finishedBets () {
             let betStateList = []
-            for (let entry of this.$store.getters['bets/listFinishState']) {
+            for (let entry of this.$store.getters['bets/list']) {
                 betStateList[entry.id]= entry.state
             }
             return betStateList
@@ -61,16 +61,15 @@
             finishedBets: {
                 handler: function(newVal, oldVal) {
                     for (let [key, value] of Object.entries(newVal)){
-                        if(value!=oldVal[key]){
+                        if(value!=oldVal[key] && oldVal[key]=='running' && value=="winner"){ // Transition: running -> winner 
                             console.log(key+" --> NewState = "+value)
-                            if(value == "winner"){
-                                let bet = this.$store.getters['bets/bet'](key)
-                                this.dc.title = "Bäämmm!! Gewinner!" 
-                                this.dc.q = bet.q
-                                this.dc.a = bet.a[bet.winnerAnswer]
-                                this.dc.winner = bet.winner
-                                this.dialog = true
-                            }
+                            let bet = this.$store.getters['bets/bet'](key)
+                            this.dc.title = "Bäämmm!! Gewinner!" 
+                            this.dc.q = bet.q
+                            this.dc.a = bet.a[bet.winnerAnswer]
+                            this.dc.winner = bet.winner
+                            this.dialog = true
+
                         }
                     }
                 }

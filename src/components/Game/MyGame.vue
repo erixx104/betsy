@@ -296,11 +296,13 @@
         // clean bets (decline, if not enough users)
         for(var bet of this.$store.getters['bets/listActiveState']){
           
+          /*
           //hack for different timestamp format directly after insert and on receive
           if("seconds" in bet.created_at && (bet.created_at.seconds!=null || bet.created_at.seconds!=undefined))
             betCreated=bet.created_at.seconds
-          else
-            betCreated=Date.parse(bet.created_at)/1000
+          else*/
+            betCreated=Date.parse(bet.created_at)/1000  //to seconds
+          
 
           age=(Math.round(Date.now()/ 1000)-betCreated)
           if(bet.state=="requested" && age>betTime){
@@ -321,12 +323,13 @@
         
         // sort bets in active, requested bets
         for(bet of this.$store.getters['bets/list']){
-          
+          /*
           //hack for different timestamp format directly after insert and on receive
           if("seconds" in bet.created_at && (bet.created_at.seconds!=null || bet.created_at.seconds!=undefined))
             betCreated=bet.created_at.seconds
-          else
-            betCreated=Date.parse(bet.created_at)/1000
+          else*/
+            betCreated=Date.parse(bet.created_at)/1000  // to seconds
+          
             
           age=(Math.round(Date.now()/ 1000)-betCreated)
           
