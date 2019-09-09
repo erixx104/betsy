@@ -21,8 +21,8 @@
                 <v-row class="subtitle-1 mt-5">
                     Gewinner
                 </v-row>
-                <v-row v-for="(wager, name) in dc.winner" class="title white--text" :key="name">
-                    {{ $store.getters['players/getPlayer'](name).name }}: {{wager}}
+                <v-row v-for="(id, name) in dc.winner" class="title white--text" :key="name">
+                    {{ $store.getters['players/getPlayer'](id).name }}&nbsp;
                 </v-row>
             </v-container>
         </v-card-text>

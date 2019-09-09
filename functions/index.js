@@ -25,11 +25,11 @@ exports.resolveBet = functions.region('europe-west1')
 
         console.log("bet was not accepted (declined) - scores will be transferred back")
 
-        // transfer back game score corresponding to "wager"-Object
-        for (let [key, value] of Object.entries(snap.after.data().wager)) {
+        // transfer back game score corresponding to "pts"-Value
+        for (let [key, value] of Object.entries(snap.after.data().selection)) { //loop through all participating players
           admin.firestore().collection('games').doc(context.params.gameId)
                            .collection('players').doc(key)
-                              .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                              .update({"score" : admin.firestore.FieldValue.increment(snap.after.data().pts)})  
         }
           
           
@@ -49,11 +49,11 @@ exports.resolveBet = functions.region('europe-west1')
         if(_.uniq(selections).length === 1){
           
           console.log("transfer Back")
-          // transfer back game score corresponding to "wager"-Object
-          for (let [key, value] of Object.entries(snap.after.data().wager)) {
+          // transfer back game score corresponding to "pts"-Value
+          for (let [key, value] of Object.entries(snap.after.data().selection)) { //loop through all participating players
             admin.firestore().collection('games').doc(context.params.gameId)
                              .collection('players').doc(key)
-                                .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                                .update({"score" : admin.firestore.FieldValue.increment(snap.after.data().pts)})  
           }
           
           
@@ -97,34 +97,36 @@ exports.resolveBet = functions.region('europe-west1')
                 console.log('Winner: '+winner)
                 
                 //if there is one or more players, which selected the winner-answer...
-                if(winner.length>=1){
+                if(winner!==undefined && winner.length>=1){
                 
-                    // calculate overall Pot (sum of all wagers)
-                    let potSize = Object.values(snap.after.data().wager).reduce((a, b) => a + b);
+                    // calculate overall Pot (#better * pts)
+                    let potSize = Object.keys(snap.after.data().selection).length * snap.after.data().pts
                     console.log('Overall pot: '+potSize)
                     
-                    // calculate sum of winner wager
-                    let winnerWager = Object.values(_.pick(snap.after.data().wager, winner)).reduce((a, b) => a + b)
+                    console.log('Number of winner: '+ winner.length + ' - Win per winner: ' + potSize/winner.length)
                     
-                    console.log('Winner wager: '+winnerWager)
+                    // calculate sum of winner wager
+                    //let winnerWager = Object.values(_.pick(snap.after.data().wager, winner)).reduce((a, b) => a + b)
+                    
+                    //.log('Winner wager: '+winnerWager)
                     
                     // create winner object, by filtering wager to only winner and then calculate the win
-                    let winnerObj = _.mapValues(_.pick(snap.after.data().wager,winner), (o) => Math.ceil(o/winnerWager*potSize) )
+                    // let winnerObj = _.mapValues(_.pick(snap.after.data().wager,winner), (o) => Math.ceil(o/winnerWager*potSize) )
                     
-                    console.log( winnerObj )
+                    // console.log( winnerObj )
                     
                     //write WinnerObj & set State
                     snap.after.ref.set({
                         winnerAnswer: result,
-                        winner: winnerObj,
+                        winner: winner,
                         state: 'winner',
                       }, {merge: true})
                       
                     // recalculate game-scores corresponding to winnerObj
-                    for (let [key, value] of Object.entries(winnerObj)) {
+                    for (let key of winner) {
                       admin.firestore().collection('games').doc(context.params.gameId)
                                        .collection('players').doc(key)
-                                          .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                                          .update({"score" : admin.firestore.FieldValue.increment(potSize/winner.length)})  
                     }
                 }else{
                     // if no player picked the winner-answer
@@ -135,11 +137,11 @@ exports.resolveBet = functions.region('europe-west1')
                         state: 'noWinner',
                       }, {merge: true})
                       
-                    // transfer back game score corresponding to "wager"-Object
-                    for (let [key, value] of Object.entries(snap.after.data().wager)) {
+                    // transfer back game score corresponding to "pts"-value
+                    for (let [key, value] of Object.entries(snap.after.data().selection)) {
                       admin.firestore().collection('games').doc(context.params.gameId)
                                        .collection('players').doc(key)
-                                          .update({"score" : admin.firestore.FieldValue.increment(value)})  
+                                          .update({"score" : admin.firestore.FieldValue.increment(snap.after.data().pts)})  
                     }
                 }
                 

@@ -25,25 +25,6 @@
                 </v-radio-group>
               </v-row>
             </v-container>
-              
-            <v-container>
-              <v-row>
-                <v-subheader>Dein Einsatz: <h3 style="margin-top:-2px;margin-left:4px">{{bet}}</h3></v-subheader>
-              </v-row>
-              <v-row>
-                <v-slider
-                  v-model="bet"
-                  step="5"
-                  min="5"
-                  max="25"
-                  :tick-labels=[5,10,15,20,25]
-                  ticks="always"
-                  color="deep-orange"
-                  tick-size="4"
-                   class="pl-2 pr-2"
-                    ></v-slider>
-              </v-row>
-            </v-container>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -59,11 +40,10 @@
 <script>
     export default{
         data: () => ({
-            content : {q : "", a : []},
+            content : {q : "", a : [], pts : 0},
             dialog: false,
             valid: true,
             userAnswer : null,
-            bet : 10,
             AnswerRules: [
                 v => v!=null || 'Antwortmöglichkeit auswählen',
               ],
@@ -75,17 +55,15 @@
           submitBet () {
             if (this.$refs.joinBetForm.validate()) {
               
-              var wager = {}
               var selection = {}
               
-              wager[this.$store.getters.userID]=this.bet
               selection[this.$store.getters.userID]=this.userAnswer
               
-              this.$store.dispatch('bets/patch', {id : this.content.id, wager, selection })
+              this.$store.dispatch('bets/patch', {id : this.content.id, selection })
                 .catch(console.error)
                 .then(() =>{
                     this.dialog = false
-                    this.$store.dispatch('addUserScore', {user: this.$store.getters.userID, score: -this.bet})
+                    this.$store.dispatch('addUserScore', {user: this.$store.getters.userID, score: -this.content.pts})
   
                 })
                   

@@ -35,6 +35,24 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                  <v-container>
+                    <v-row>
+                      <v-subheader>Einsatz: <h3 style="margin-top:-2px;margin-left:4px">{{pts}}</h3></v-subheader>
+                    </v-row>
+                    <v-row>
+                      <v-slider
+                        v-model="pts"
+                        step="5"
+                        min="5"
+                        max="25"
+                        :tick-labels=[5,10,15,20,25]
+                        ticks="always"
+                        color="deep-orange"
+                        tick-size="4"
+                         class="pl-2 pr-2"
+                          ></v-slider>
+                    </v-row>
+                  </v-container>
                   
                 </v-card-text>
                 <v-card-actions>
@@ -54,6 +72,7 @@
         data: () => ({
             a : [],
             q : '',
+            pts : 10,
             dialog: false,
             valid: true,
             QuestionRules: [
@@ -83,6 +102,7 @@
                 const bet = {
                     q : this.q,
                     a : cleanedA,
+                    pts : this.pts,
                     state : 'requested',
                     created_at : Date.now()
                 }
@@ -98,6 +118,7 @@
                     }
                     this.q = ''
                     this.valid = true
+                    this.pts = 10
                     this.dialog = false
                     this.players = []
                     
@@ -116,6 +137,7 @@
                 this.a[i] = '';
               }
               this.q = ''
+              this.pts = 10
               this.valid = true
               this.players = []
             }

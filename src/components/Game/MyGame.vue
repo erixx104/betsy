@@ -19,11 +19,12 @@
               class="mb-6"
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](requestedBet.created_by).name }}</span>
-            <v-card-title style="opacity:1.0" class="teal--text text--lighten-3">
+            <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ requestedBet.pts }}</span>
+            <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
               {{ requestedBet.q }}
             </v-card-title>
       
-            <v-card-text class="white--text d-flex flex-row justify-space-between" style="opacity:1.0">
+            <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
               <div class="d-flex">
                 <ol class="body-1 white--text">
                   <li v-for="(answer, i) in requestedBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}</li>
@@ -38,14 +39,14 @@
                   </div>
                   
                   <div class="d-block text-center">
-                    <v-btn small color="secondary" @click="join(requestedBet.id)" v-if="!('wager' in requestedBet)||!(userID in requestedBet.wager)">
+                    <v-btn small color="secondary" @click="join(requestedBet.id)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)">
                       einsteigen
                     </v-btn>
                   </div>
                   
-                  <div class="d-block text-center mt-2 grey--text" style="min-height:28px">
-                    <div v-if="'wager' in requestedBet" >
-                      <v-tooltip class="ml-1 mr-1" bottom  v-for="(value, id) in requestedBet.wager" :key="id">
+                  <div class="d-block text-center mt-2 black--text" style="min-height:28px">
+                    <div v-if="'selection' in requestedBet" >
+                      <v-tooltip class="ml-1 mr-1" bottom  v-for="(value, id) in requestedBet.selection" :key="id">
                         <template v-slot:activator="{ on }">
                           <v-list-item-avatar v-on="on" class="mt-0 mr-0 mb-0 ml-0" :color="$store.getters['players/list'].find(x => x.id==id).color" size="28" :key="id">
                             {{ $store.getters['players/list'].find(x => x.id==id).initials }}     
@@ -61,7 +62,7 @@
             </v-card-text>
 
             <v-card-actions class="d-flex d-sm-none" >
-              <v-btn class="mb-3" small outlined block color="secondary" @click="join(requestedBet.id)" v-if="!('wager' in requestedBet)||!(userID in requestedBet.wager)">
+              <v-btn class="mb-3" small outlined block color="secondary" @click="join(requestedBet.id)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)">
                   einsteigen
                 </v-btn>
             </v-card-actions>
@@ -78,11 +79,12 @@
               class="mb-6" 
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}</span>
-            <v-card-title style="opacity:1.0" class="teal--text text--lighten-3">
+            <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ runningBet.pts }}</span>
+            <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
               {{ runningBet.q }}
             </v-card-title>
       
-            <v-card-text class="white--text d-flex flex-row justify-space-between" style="opacity:1.0">
+            <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
               <div class="d-flex">
                 <ol class="body-1 white--text">
                   <li v-for="(answer, i) in runningBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
@@ -92,7 +94,7 @@
                           <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==id).color" size="10" :key="id">
                           </v-list-item-avatar> 
                         </template>
-                        <span>{{ $store.getters['players/list'].find(x => x.id==id).name }} - Einsatz: {{ $store.getters['bets/bet'](runningBet.id).wager[id] }} </span>
+                        <span>{{ $store.getters['players/list'].find(x => x.id==id).name }}</span>
                       </v-tooltip>
                     </span>
                   </li>
@@ -105,14 +107,14 @@
                     Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}
                   </div>
                   <div class="d-block text-center">
-                    <v-btn :disabled="!(userID in runningBet.wager)" class="mb-1" :class="Object.keys(runningBet.wager).length>0?'':'deep-orange accent-3'" small color="light-blue darken-3" @click="resolve(runningBet.id)">
+                    <v-btn :disabled="!(userID in runningBet.selection)" class="mb-1" :class="Object.keys(runningBet.selection).length>0?'':'deep-orange accent-3'" small color="light-blue darken-3" @click="resolve(runningBet.id)">
                       auflösen
                     </v-btn>
                   </div>
                   <div class="d-block text-center overline grey--text">
                     gelöst: 
-                    <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.wager).length*0.51))" size="30" color="light-blue darken-5" :class="Object.keys(runningBet.wager).length>0?'':'deep-orange--text text--accent-2'">
-                      {{ Math.ceil(Object.keys(runningBet.wager).length*0.51) }}
+                    <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.selection).length*0.51))" size="30" color="light-blue darken-5" :class="Object.keys(runningBet.selection).length>0?'':'deep-orange--text text--accent-2'">
+                      {{ Math.ceil(Object.keys(runningBet.selection).length*0.51) }}
                     </v-progress-circular>                    
                   </div>
                 </div>
@@ -120,8 +122,8 @@
             </v-card-text>
 
             <v-card-actions class="d-flex d-sm-none" >
-              <v-btn :disabled="!(userID in runningBet.wager)" class="mb-1" small outlined block color="light-blue darken-3" :class="Object.keys(runningBet.wager).length>0?'':'deep-orange accent-3'" @click="resolve(runningBet.id)">
-                auflösen ({{runningBet.nVerdicts?runningBet.nVerdicts:0}}/{{(Object.keys(runningBet.wager).length)}})
+              <v-btn :disabled="!(userID in runningBet.selection)" class="mb-1" small outlined block color="light-blue darken-3" :class="Object.keys(runningBet.selection).length>0?'':'deep-orange accent-3'" @click="resolve(runningBet.id)">
+                auflösen ({{runningBet.nVerdicts?runningBet.nVerdicts:0}}/{{(Object.keys(runningBet.selection).length)}})
               </v-btn>
             </v-card-actions>
 
@@ -135,11 +137,12 @@
               class="mb-6"  outlined style="background-color: transparent!important;opacity:0.7"
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}</span>
-            <v-card-title class="teal--text text--lighten-3">
+            <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ finishedBet.pts }}</span>
+            <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
               {{ finishedBet.q }}
             </v-card-title>
       
-            <v-card-text class="white--text d-flex flex-row justify-space-between">
+            <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
               <div class="d-flex">
                 <v-container class="mb-0 mt-0 pb-0 pt-0">
                   <v-row class="mb-0 mt-0 pb-0 pt-0">
@@ -151,7 +154,7 @@
                               <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==id).color" size="10" :key="id">
                               </v-list-item-avatar> 
                             </template>
-                            <span>{{ $store.getters['players/list'].find(x => x.id==id).name }} - Einsatz: {{ $store.getters['bets/bet'](finishedBet.id).wager[id] }} </span>
+                            <span>{{ $store.getters['players/list'].find(x => x.id==id).name }}</span>
                           </v-tooltip>
                         </span>
                       </li>
@@ -168,7 +171,7 @@
                       Keiner hatte die richtige Antwort
                     </div>
                     <div v-if="finishedBet.state=='winner'">
-                      Gewinner: <span v-for="(wager, name) in finishedBet.winner" :key="name">{{ $store.getters['players/getPlayer'](name).name }}&nbsp;</span>
+                      Gewinner: <span v-for="(id, pups) in finishedBet.winner" :key="id">{{ $store.getters['players/getPlayer'](id).name }}&nbsp;</span>
                     </div>
                   </v-row>
                 </v-container>
@@ -306,12 +309,12 @@
 
           age=(Math.round(Date.now()/ 1000)-betCreated)
           if(bet.state=="requested" && age>betTime){
-            if(!("wager" in bet)){
+            if(!("selection" in bet)){
               console.log("Keiner hat geboten auf '"+bet.q+"'")
               this.$store.dispatch('bets/patch', {id : bet.id, state:'declined'})
             }else{
-              console.log("Bieter: '"+bet.q+"': "+Object.keys(bet.wager).length)
-              if(Object.keys(bet.wager).length<2){
+              console.log("Bieter: '"+bet.q+"': "+Object.keys(bet.selection).length)
+              if(Object.keys(bet.selection).length<2){
                 this.$store.dispatch('bets/patch', {id : bet.id, state:'declined'})
                 //for(player)
               }else{
