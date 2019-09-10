@@ -68,6 +68,7 @@
                             this.dc.q = bet.q
                             this.dc.a = bet.a[bet.winnerAnswer]
                             this.dc.winner = bet.winner
+                            this.playSound(require('@/assets/sound2.mp3'))
                             this.dialog = true
 
                         }

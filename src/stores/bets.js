@@ -59,7 +59,19 @@ const bets = {
         return state.synced[betID]
       else
         return null
-      
+    },
+    
+    getVerdictList (state, getters) {
+        let verdictList = {}
+        for(var bet of getters.listActiveState){
+         // if(bet.state=="running"){
+            if("verdict" in bet)
+              Object.assign(verdictList, { [bet.id]: Object.keys(bet.verdict).length});
+            else
+              Object.assign(verdictList, { [bet.id]: 0});
+          //}
+        }
+        return verdictList
     }
   },
   mutations: {},

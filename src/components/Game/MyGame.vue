@@ -113,7 +113,7 @@
                   </div>
                   <div class="d-block text-center overline grey--text">
                     gelöst: 
-                    <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.selection).length*0.51))" size="30" color="light-blue darken-5" :class="Object.keys(runningBet.selection).length>0?'':'deep-orange--text text--accent-2'">
+                    <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.selection).length*0.51))" size="30" color="light-blue darken-5" :class="runningBet.nVerdicts==0?'':'deep-orange--text text--accent-2'">
                       {{ Math.ceil(Object.keys(runningBet.selection).length*0.51) }}
                     </v-progress-circular>                    
                   </div>
@@ -171,7 +171,7 @@
                       Keiner hatte die richtige Antwort
                     </div>
                     <div v-if="finishedBet.state=='winner'">
-                      Gewinner: <span v-for="(id, pups) in finishedBet.winner" :key="id">{{ $store.getters['players/getPlayer'](id).name }}&nbsp;</span>
+                      Gewinner: <span v-for="id in finishedBet.winner" :key="id">{{ $store.getters['players/getPlayer'](id).name }}&nbsp;</span>
                     </div>
                   </v-row>
                 </v-container>
@@ -199,6 +199,7 @@
   import ResolveBet from './ResolveBet.vue'
   import AwardBet from './AwardBet.vue'
   import Scoreboard from './Scoreboard.vue'
+  const _ = require('lodash');
 
   export default {
     props: ['id'],
@@ -207,6 +208,7 @@
       requestedBets : [],
       runningBets : [],
       finishedBets : [],
+      blockSound_requested : [],
       watchdogInterval : null,
       started : false
       
@@ -298,15 +300,9 @@
         
         // clean bets (decline, if not enough users)
         for(var bet of this.$store.getters['bets/listActiveState']){
-          
-          /*
-          //hack for different timestamp format directly after insert and on receive
-          if("seconds" in bet.created_at && (bet.created_at.seconds!=null || bet.created_at.seconds!=undefined))
-            betCreated=bet.created_at.seconds
-          else*/
-            betCreated=Date.parse(bet.created_at)/1000  //to seconds
-          
 
+          betCreated=Date.parse(bet.created_at)/1000  //to seconds
+          
           age=(Math.round(Date.now()/ 1000)-betCreated)
           if(bet.state=="requested" && age>betTime){
             if(!("selection" in bet)){
@@ -326,14 +322,9 @@
         
         // sort bets in active, requested bets
         for(bet of this.$store.getters['bets/list']){
-          /*
-          //hack for different timestamp format directly after insert and on receive
-          if("seconds" in bet.created_at && (bet.created_at.seconds!=null || bet.created_at.seconds!=undefined))
-            betCreated=bet.created_at.seconds
-          else*/
-            betCreated=Date.parse(bet.created_at)/1000  // to seconds
+
+          betCreated=Date.parse(bet.created_at)/1000  // to seconds
           
-            
           age=(Math.round(Date.now()/ 1000)-betCreated)
           
           if(bet.state=="requested"){
@@ -345,7 +336,13 @@
               color="#FF3D00"
             else if(pbWidth<33)
               color="#FFCA28"
-
+              
+            // Check if for specific bet the sound was already played (is on block list) - if not, play sound and add to block list
+            if(!this.blockSound_requested.includes(bet.id)){
+              this.playSound(require('@/assets/sound1.mp3'))
+              this.blockSound_requested.push(bet.id)
+            }
+            
             this.requestedBets.push(Object.assign(bet, {age,color,pbWidth}))
           }
           else if(bet.state=="running"){
@@ -357,13 +354,6 @@
             console.log("That shouldn't happen: "+bet)
         }
       },
-      
-      playSound (sound) {
-      if(sound) {
-        var audio = new Audio(sound);
-        audio.play();
-      }
-    }
     },
     
     computed: {
@@ -375,18 +365,8 @@
         return this.$store.getters['bets/listActiveState']  
       },
       
-      verdicts() {
-        var verdictList = []
-        for(var bet of this.$store.getters['bets/listActiveState']){
-          if(bet.state=="running"){
-            if("verdict" in bet)
-              verdictList[bet.id]=Object.keys(bet.verdict).length
-            else
-              verdictList[bet.id]=0
-          }
-        }
-        
-        return verdictList
+      verdicts : function() {
+        return this.$store.getters['bets/getVerdictList']
       },
       
       initialized () {
@@ -404,15 +384,16 @@
       },
       
       activeStateBetsGetter() {
-        // there could have been an update on the bets -> recalculate => watchdog
-        //this.playSound(require('@/assets/sound5.mp3'))
-        this.watchdog()
+        //this.watchdog()
       },
       
-      verdictList: {
+      verdicts: {
           handler: function(newVal, oldVal) {
+              if(oldVal!=undefined && oldVal!=null && !_.isEmpty(oldVal, true) && !_.isEqual(oldVal,newVal))
+                this.playSound(require('@/assets/sound5.mp3'))
               console.log(newVal)
               console.log(oldVal)
+              
           },
           deep: true
       }

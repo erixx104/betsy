@@ -7,6 +7,20 @@ import vuetify from './plugins/vuetify';
 Vue.config.productionTip = false
 
 
+
+Vue.mixin({
+  methods: {
+    playSound (sound) {
+      if(sound) {
+        var audio = new Audio(sound);
+        audio.play();
+      }    
+    }
+  }
+  
+})
+
+
 //--------------------------------------
 
 new Vue({
