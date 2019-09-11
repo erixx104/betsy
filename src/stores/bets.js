@@ -67,7 +67,7 @@ const bets = {
          // if(bet.state=="running"){
             if("verdict" in bet)
               Object.assign(verdictList, { [bet.id]: Object.keys(bet.verdict).length});
-            else
+            else if(bet.state=="running")
               Object.assign(verdictList, { [bet.id]: 0});
           //}
         }
