@@ -1,0 +1,33 @@
+[debug] [2019-09-29T16:37:03.732Z] ----------------------------------------------------------------------
+[debug] [2019-09-29T16:37:03.735Z] Command:       /home/ubuntu/.nvm/versions/node/v10.16.2/bin/node /home/ubuntu/.nvm/versions/node/v10.16.2/bin/firebase emulators:start
+[debug] [2019-09-29T16:37:03.735Z] CLI Version:   7.3.1
+[debug] [2019-09-29T16:37:03.735Z] Platform:      linux
+[debug] [2019-09-29T16:37:03.735Z] Node Version:  v10.16.2
+[debug] [2019-09-29T16:37:03.736Z] Time:          Sun Sep 29 2019 16:37:03 GMT+0000 (Coordinated Universal Time)
+[debug] [2019-09-29T16:37:03.736Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-09-29T16:37:03.743Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-09-29T16:37:03.743Z] > authorizing via signed-in user
+[info] i  Starting emulators: ["functions","hosting"]
+[info] ✔  functions: Using node@10 from host.
+[info] ✔  functions: Emulator started at http://localhost:8082
+[debug] [2019-09-29T16:37:04.032Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/betsy-14cf1/webApps/-/config  
+ 
+[debug] [2019-09-29T16:37:04.393Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: dist
+[info] ✔  hosting: Local server: http://localhost:5000
+[info] ✔  hosting: Emulator started at http://localhost:5000
+[info] i  functions: Watching "/home/ubuntu/environment/betsy/functions" for Cloud Functions...
+[debug] [2019-09-29T16:37:04.971Z] [runtime-status] Functions runtime initialized. {"cwd":"/home/ubuntu/environment/betsy/functions","node_version":"10.16.2"}
+[debug] [2019-09-29T16:37:04.981Z] [runtime-status] Disabled runtime features: undefined {}
+[debug] [2019-09-29T16:37:04.985Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"/home/ubuntu/environment/betsy/functions/node_modules/firebase-admin/lib/index.js"}
+[debug] [2019-09-29T16:37:04.987Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"/home/ubuntu/environment/betsy/functions/node_modules/firebase-functions/lib/index.js"}
+[debug] [2019-09-29T16:37:05.176Z] [runtime-status] Found google-gax at /home/ubuntu/environment/betsy/functions/node_modules/google-gax/build/src/index.js {}
+[debug] [2019-09-29T16:37:05.178Z] [runtime-status] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"},{"name":"google-gax","status":"mocked"}]
+[debug] [2019-09-29T16:37:05.223Z] [runtime-status] Checked functions.config() {"config":{}}
+[debug] [2019-09-29T16:37:05.225Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"/home/ubuntu/environment/betsy/functions/node_modules/firebase-functions/lib/index.js"}
+[debug] [2019-09-29T16:37:05.227Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"/home/ubuntu/environment/betsy/functions/node_modules/firebase-admin/lib/index.js"}
+[debug] [2019-09-29T16:37:05.254Z] [runtime-status] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"8.4.0","resolution":"/home/ubuntu/environment/betsy/functions/node_modules/firebase-admin/lib/index.js"}}
+[debug] [2019-09-29T16:37:05.260Z] [runtime-status] initializeApp(DEFAULT) {"databaseURL":"https://betsy-14cf1.firebaseio.com","storageBucket":"betsy-14cf1.appspot.com","projectId":"betsy-14cf1"}
+[info] i  functions[resolveBet]: function ignored because the firestore emulator does not exist or is not running.
+[info] ✔  All emulators started, it is now safe to connect.
