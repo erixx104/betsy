@@ -1,0 +1,16 @@
+API endpoint: http://localhost:5010
+WebChannel endpoint: http://localhost:5011
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=localhost:5010
+
+Dev App Server is now running.
+
+Sep 30, 2019 10:29:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Sep 30, 2019 10:29:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+Sep 30, 2019 10:34:20 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+Sep 30, 2019 10:34:20 PM io.gapi.emulators.netty.NotFoundHandler handleRequest
+INFO: Unknown request URI: /favicon.ico

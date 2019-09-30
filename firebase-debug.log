@@ -1,0 +1,100 @@
+[debug] [2019-09-30T20:29:32.116Z] ----------------------------------------------------------------------
+[debug] [2019-09-30T20:29:32.119Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\erikl\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js emulators:start
+[debug] [2019-09-30T20:29:32.119Z] CLI Version:   7.4.0
+[debug] [2019-09-30T20:29:32.119Z] Platform:      win32
+[debug] [2019-09-30T20:29:32.119Z] Node Version:  v10.13.0
+[debug] [2019-09-30T20:29:32.120Z] Time:          Mon Sep 30 2019 22:29:32 GMT+0200 (GMT+02:00)
+[debug] [2019-09-30T20:29:32.120Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-09-30T20:29:32.130Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-09-30T20:29:32.130Z] > authorizing via signed-in user
+[info] i  Starting emulators: ["functions","firestore","hosting"]
+[info] +  functions: Using node@10 from host.
+[info] +  functions: Emulator started at http://localhost:5001
+[info] i  firestore: Serving WebChannel traffic on at http://localhost:5011
+[info] i  firestore: downloading cloud-firestore-emulator-v1.8.4.jar...
+[debug] [2019-09-30T20:29:54.859Z] Ignoring unsupported arg: projectId
+[debug] [2019-09-30T20:29:54.859Z] Ignoring unsupported arg: auto_download
+[debug] [2019-09-30T20:29:54.859Z] Starting emulator firestore with command {"binary":"java","args":["-Duser.language=en","-jar","C:\\Users\\erikl\\.cache\\firebase\\emulators\\cloud-firestore-emulator-v1.8.4.jar","--host","localhost","--port",5010,"--rules","C:\\Projects\\betsy\\firestore.rules","--functions_emulator","localhost:5001","--webchannel_port",5011],"optionalArgs":["port","webchannel_port","host","rules","functions_emulator"]}
+[info] i  firestore: Emulator logging to firestore-debug.log
+[debug] [2019-09-30T20:29:56.794Z] API endpoint: http://localhost:5010
+
+[debug] [2019-09-30T20:29:56.794Z] WebChannel endpoint: http://localhost:5011
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=localhost:5010
+
+Dev App Server is now running.
+
+
+[info] +  firestore: Emulator started at http://localhost:5010
+[info] i  firestore: For testing set FIRESTORE_EMULATOR_HOST=localhost:5010
+[debug] [2019-09-30T20:29:57.001Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/betsy-14cf1/webApps/-/config  
+ 
+[debug] [2019-09-30T20:29:57.508Z] <<< HTTP RESPONSE 200
+[info] i  hosting: Serving hosting files from: dist
+[info] +  hosting: Local server: http://localhost:5000
+[info] +  hosting: Emulator started at http://localhost:5000
+[info] i  functions: Watching "C:\Projects\betsy\functions" for Cloud Functions...
+[debug] [2019-09-30T20:29:58.227Z] [runtime-status] Functions runtime initialized. {"cwd":"C:\\Projects\\betsy\\functions","node_version":"10.13.0"}
+[debug] [2019-09-30T20:29:58.227Z] [runtime-status] Disabled runtime features: undefined {}
+[debug] [2019-09-30T20:29:58.230Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:29:58.232Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:29:58.537Z] [runtime-status] Found google-gax at C:\Projects\betsy\functions\node_modules\google-gax\build\src\index.js {}
+[debug] [2019-09-30T20:29:58.537Z] [runtime-status] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"},{"name":"google-gax","status":"mocked"}]
+[debug] [2019-09-30T20:29:58.598Z] [runtime-status] Checked functions.config() {"config":{}}
+[debug] [2019-09-30T20:29:58.599Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:29:58.601Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:29:58.657Z] [runtime-status] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2019-09-30T20:29:58.660Z] [runtime-status] initializeApp(DEFAULT) {"databaseURL":"https://betsy-14cf1.firebaseio.com","storageBucket":"betsy-14cf1.appspot.com","projectId":"betsy-14cf1"}
+[debug] [2019-09-30T20:29:58.736Z] addFirestoreTrigger "{\"eventTrigger\":{\"resource\":\"projects/betsy-14cf1/databases/(default)/documents/games/{gameId}/bets/{betId}\",\"eventType\":\"providers/cloud.firestore/eventTypes/document.write\",\"service\":\"firestore.googleapis.com\"}}"
+[debug] [2019-09-30T20:29:58.829Z] Sep 30, 2019 10:29:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+
+[debug] [2019-09-30T20:29:58.968Z] Sep 30, 2019 10:29:58 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected HTTP/2 connection.
+
+[info] +  functions[resolveBet]: firestore function initialized.
+[info] +  All emulators started, it is now safe to connect.
+[debug] [2019-09-30T20:31:19.466Z] File C:\Projects\betsy\functions\index.js changed, reloading triggers
+[debug] [2019-09-30T20:31:20.977Z] [runtime-status] Functions runtime initialized. {"cwd":"C:\\Projects\\betsy\\functions","node_version":"10.13.0"}
+[debug] [2019-09-30T20:31:20.977Z] [runtime-status] Disabled runtime features: undefined {}
+[debug] [2019-09-30T20:31:20.980Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:31:20.981Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:31:21.299Z] [runtime-status] Found google-gax at C:\Projects\betsy\functions\node_modules\google-gax\build\src\index.js {}
+[debug] [2019-09-30T20:31:21.299Z] [runtime-status] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"},{"name":"google-gax","status":"mocked"}]
+[debug] [2019-09-30T20:31:21.353Z] [runtime-status] Checked functions.config() {"config":{}}
+[debug] [2019-09-30T20:31:21.353Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:31:21.354Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:31:21.406Z] [runtime-status] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2019-09-30T20:31:21.408Z] [runtime-status] initializeApp(DEFAULT) {"databaseURL":"https://betsy-14cf1.firebaseio.com","storageBucket":"betsy-14cf1.appspot.com","projectId":"betsy-14cf1"}
+[debug] [2019-09-30T20:34:20.477Z] Sep 30, 2019 10:34:20 PM io.gapi.emulators.netty.HttpVersionRoutingHandler channelRead
+INFO: Detected non-HTTP/2 connection.
+
+[debug] [2019-09-30T20:34:20.782Z] Sep 30, 2019 10:34:20 PM io.gapi.emulators.netty.NotFoundHandler handleRequest
+INFO: Unknown request URI: /favicon.ico
+
+[debug] [2019-09-30T20:36:49.759Z] File C:\Projects\betsy\functions\index.js changed, reloading triggers
+[debug] [2019-09-30T20:36:51.254Z] [runtime-status] Functions runtime initialized. {"cwd":"C:\\Projects\\betsy\\functions","node_version":"10.13.0"}
+[debug] [2019-09-30T20:36:51.254Z] [runtime-status] Disabled runtime features: undefined {}
+[debug] [2019-09-30T20:36:51.257Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:36:51.258Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:36:51.544Z] [runtime-status] Found google-gax at C:\Projects\betsy\functions\node_modules\google-gax\build\src\index.js {}
+[debug] [2019-09-30T20:36:51.545Z] [runtime-status] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"},{"name":"google-gax","status":"mocked"}]
+[debug] [2019-09-30T20:36:51.593Z] [runtime-status] Checked functions.config() {"config":{}}
+[debug] [2019-09-30T20:36:51.594Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:36:51.595Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:36:51.643Z] [runtime-status] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2019-09-30T20:36:51.645Z] [runtime-status] initializeApp(DEFAULT) {"databaseURL":"https://betsy-14cf1.firebaseio.com","storageBucket":"betsy-14cf1.appspot.com","projectId":"betsy-14cf1"}
+[debug] [2019-09-30T20:46:05.033Z] File C:\Projects\betsy\functions\index.js changed, reloading triggers
+[debug] [2019-09-30T20:46:06.555Z] [runtime-status] Functions runtime initialized. {"cwd":"C:\\Projects\\betsy\\functions","node_version":"10.13.0"}
+[debug] [2019-09-30T20:46:06.555Z] [runtime-status] Disabled runtime features: undefined {}
+[debug] [2019-09-30T20:46:06.558Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:46:06.559Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:46:06.853Z] [runtime-status] Found google-gax at C:\Projects\betsy\functions\node_modules\google-gax\build\src\index.js {}
+[debug] [2019-09-30T20:46:06.853Z] [runtime-status] Outgoing network have been stubbed. [{"name":"http","status":"mocked"},{"name":"http","status":"mocked"},{"name":"https","status":"mocked"},{"name":"https","status":"mocked"},{"name":"net","status":"mocked"},{"name":"google-gax","status":"mocked"}]
+[debug] [2019-09-30T20:46:06.911Z] [runtime-status] Checked functions.config() {"config":{}}
+[debug] [2019-09-30T20:46:06.911Z] [runtime-status] Resolved module firebase-functions {"declared":true,"installed":true,"version":"3.2.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-functions\\lib\\index.js"}
+[debug] [2019-09-30T20:46:06.912Z] [runtime-status] Resolved module firebase-admin {"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}
+[debug] [2019-09-30T20:46:06.959Z] [runtime-status] firebase-admin has been stubbed. {"adminResolution":{"declared":true,"installed":true,"version":"8.4.0","resolution":"C:\\Projects\\betsy\\functions\\node_modules\\firebase-admin\\lib\\index.js"}}
+[debug] [2019-09-30T20:46:06.961Z] [runtime-status] initializeApp(DEFAULT) {"databaseURL":"https://betsy-14cf1.firebaseio.com","storageBucket":"betsy-14cf1.appspot.com","projectId":"betsy-14cf1"}

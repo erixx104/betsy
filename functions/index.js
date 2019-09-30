@@ -48,7 +48,7 @@ exports.resolveBet = functions.region('europe-west1')
         // if there are no different selections (all picked the same -> transfer back score and stop bet -> State = "agreed")
         if(_.uniq(selections).length === 1){
           
-          console.log("transfer Back")
+          console.log("transfer Back!")
           // transfer back game score corresponding to "pts"-Value
           for (let [key, value] of Object.entries(snap.after.data().selection)) { //loop through all participating players
             admin.firestore().collection('games').doc(context.params.gameId)
