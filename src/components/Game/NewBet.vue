@@ -1,69 +1,77 @@
 <template>
-        <v-dialog v-model="dialog" persistent max-width="600px" :fullscreen="$vuetify.breakpoint.xs">
-          <template v-slot:activator="{ on }">
-            <v-btn color="primary" block v-on="on">Neue Wette</v-btn>
-          </template>
-          <v-form
-              ref="newBetForm"
-              v-model="valid"
-              @submit.prevent.native="submitBet"
-              lazy-validation>  
-              <v-card>
-                <v-card-title class="mb-0 mt-0 pb-0">
-                  <span class="headline">Neue Wette anbieten</span>
-                </v-card-title>
-                <v-card-text class="mb-0 mt-0 pt-0 pb-0">
-                  <v-container class="mb-0 mt-0 pt-0 pb-0">
-                    <v-row class="mb-0 mt-0 pt-0 pb-0">
-                      <v-col cols="12" class="mb-0 mt-0 pt-0 pb-0">
-                        <v-text-field v-model="q" :rules="QuestionRules" label="Wette eingeben *" required></v-text-field>
-                      </v-col>
-                      <v-col cols="12" class="mb-0 pb-0 mt-5">
-                          <h3 class="mb-0 pb-0">Antwortmöglichkeiten:</h3>
-                      </v-col>
-                      <v-col cols="10" offset="1" class="mb-0 mt-0 pt-0 pb-0">
-                        <v-text-field :rules="AnswerRules" v-model="a[1]" label="Bitte eingeben*" required hint="Antwort 1" persistent-hint class="mt-3 pt-0"></v-text-field>
-                        <v-text-field :rules="AnswerRules" v-model="a[2]" label="Bitte eingeben*" required hint="Antwort 2" persistent-hint></v-text-field>
-                        <v-text-field v-model="a[3]" label="Bitte eingeben" hint="Antwort 3" persistent-hint></v-text-field>
-                        <v-text-field v-model="a[4]" label="Bitte eingeben" hint="Antwort 4" persistent-hint></v-text-field>
-                        <v-text-field v-model="a[5]" label="Bitte eingeben" hint="Antwort 5" persistent-hint v-show="a[4]==''?false:true"></v-text-field>
-                        <v-text-field v-model="a[6]" label="Bitte eingeben" hint="Antwort 6" persistent-hint v-show="a[5]==''?false:true"></v-text-field>
-                        <v-text-field v-model="a[7]" label="Bitte eingeben" hint="Antwort 7" persistent-hint v-show="a[6]==''?false:true"></v-text-field>
-                        <v-text-field v-model="a[8]" label="Bitte eingeben" hint="Antwort 8" persistent-hint v-show="a[7]==''?false:true"></v-text-field>
-                        <v-text-field v-model="a[9]" label="Bitte eingeben" hint="Antwort 9" persistent-hint v-show="a[8]==''?false:true"></v-text-field>
-                        <v-text-field v-model="a[10]" label="Bitte eingeben" hint="Antwort 10" persistent-hint v-show="a[9]==''?false:true"></v-text-field>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                  <v-container>
-                    <v-row>
-                      <v-subheader>Einsatz: <h3 style="margin-top:-2px;margin-left:4px">{{pts}}</h3></v-subheader>
-                    </v-row>
-                    <v-row>
-                      <v-slider
-                        v-model="pts"
-                        step="5"
-                        min="5"
-                        max="25"
-                        :tick-labels=[5,10,15,20,25]
-                        ticks="always"
-                        color="deep-orange"
-                        tick-size="4"
-                         class="pl-2 pr-2"
-                          ></v-slider>
-                    </v-row>
-                  </v-container>
+  <v-container class="pl-0 pr-0 mt-3 pt-0 mb-0 pb-0">
+    <v-form
+      ref="newBetForm"
+      v-model="valid"
+      @submit.prevent.native="submitBet"
+      lazy-validation>
+      <v-card class="mt-3">
+        <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">neue Wette</span>
+        <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1" v-if="q!=''" >{{pts}}</span>
+        <v-card-title class="teal--text text--lighten-3 mb-0 pb-0" style="z-index:2;position:relative">
+          <v-text-field v-model="q" :rules="QuestionRules" class="mt-0 pt-0 mb-0 pb-0" label="Neue Wette eingeben *" validate-on-blur required single-line color="teal lighten-3"></v-text-field>
+        </v-card-title>
                   
-                </v-card-text>
-                <v-card-actions>
-                  <small class="mt-3 ml-3 pb-3">*indicates required field</small>
-                  <v-spacer></v-spacer>
-                  <v-btn color="deep-orange accent-2" text @click="dialog = false">Close</v-btn>
-                  <v-btn color="deep-orange accent-2" text type="submit">Save</v-btn>
-                </v-card-actions>
-              </v-card>
-          </v-form>
-        </v-dialog>
+        <v-card-text v-if="q!=''" class="white--text d-flex flex-row justify-space-between mt-0 pt-0 mb-0 pb-0" style="z-index:2;position:relative">
+          <v-col class="mt-0 pt-0 mb-0 pb-0">
+
+            <div class="d-flex flex-row">
+              <v-radio-group v-model="selection" :rules="SelectionRules" class="pl-2 pr-2 mt-0 pt-0 mb-0 pb-0">
+                <v-row align="center">
+                  <v-radio hide-details class="shrink mr-2 mt-0" :value="1" :disabled="a[1]==''"></v-radio>
+                  <v-text-field :rules="AnswerRules" v-model="a[1]" label="Antwort 1*" required hint="Antwort 1" class="mt-3 pt-0"></v-text-field>
+                </v-row>
+                <v-row align="center">
+                  <v-radio hide-details class="shrink mr-2 mt-0" :value="2" :disabled="a[2]==''"></v-radio>
+                  <v-text-field :rules="AnswerRules" v-model="a[2]" label="Antwort 2*" required hint="Antwort 2" ></v-text-field>
+                </v-row>
+                <v-row align="center">
+                  <v-radio hide-details class="shrink mr-2 mt-0" :value="3" :disabled="a[3]==''"></v-radio>
+                  <v-text-field v-model="a[3]" label="Antwort 3" hint="Antwort 3" ></v-text-field>
+                </v-row>
+                <v-row align="center" v-if="a[3]==''?false:true">
+                  <v-radio hide-details class="shrink mr-2 mt-0" :value="4" :disabled="a[4]==''"></v-radio>
+                  <v-text-field v-model="a[4]" label="Antwort 4" hint="Antwort 4"></v-text-field>
+                </v-row>
+                <v-row align="center" v-if="a[4]==''?false:true">
+                  <v-radio hide-details class="shrink mr-2 mt-0" :value="5" :disabled="a[5]==''"></v-radio>
+                  <v-text-field v-model="a[5]" label="Antwort 5" hint="Antwort 5"></v-text-field>
+                </v-row>
+              </v-radio-group>  
+            </div>
+          
+          </v-col>
+          
+
+
+          <v-col>
+            <v-row style="min-width:300px">
+              <v-slider
+                v-model="pts"
+                step="5"
+                min="5"
+                max="25"
+                :tick-labels=[5,10,15,20,25]
+                ticks="always"
+                color="deep-orange"
+                tick-size="4"
+                 class="pl-2 pr-2"
+                  ></v-slider>
+            </v-row>
+            <v-row>
+              <v-btn color="deep-orange accent-2" text @click="resetBet">Close</v-btn>
+              <v-btn color="deep-orange accent-2" text type="submit">Save</v-btn>
+              
+            </v-row>
+          </v-col>
+                    
+                  
+                  
+        </v-card-text>
+
+      </v-card>
+    </v-form>
+  </v-container>
 </template>
 
 
@@ -71,16 +79,20 @@
     export default{
         data: () => ({
             a : [],
-            q : '',
+            q : 'ad',
+            selection : null,
             pts : 10,
-            dialog: false,
+            dialog: true,
             valid: true,
             QuestionRules: [
                 v => !!v || 'Bitte Wette eingeben, z.B. "Das nächste Fieldgoal erzielt..."'
               ],
             AnswerRules: [
                 v => !!v || 'Mindestens 2 Antwortmöglichkeiten sind notwendig',
-              ],  
+              ],
+            SelectionRules: [
+                v => !!v || 'Bitte deinen Tipp abgeben',
+              ],
         }),
         created (){
             for (var i = 1; i < 10; i++) {
@@ -88,6 +100,19 @@
             }
         },
         methods: {
+          
+          resetBet () {
+            this.q = ''
+            for (var i = 1; i < 10; i++) {
+              this.a[i] = '';
+            }
+            this.valid = true
+            this.pts = 10
+            this.selection = null  
+            //this.$refs.newBetForm.reset()
+            this.$refs.newBetForm.resetValidation()
+          },
+          
           submitBet () {
             if (this.$refs.newBetForm.validate()) {
               
@@ -119,9 +144,8 @@
                     this.q = ''
                     this.valid = true
                     this.pts = 10
-                    this.dialog = false
-                    this.players = []
-                    
+                    this.selection = null
+
                 })
                 
             }
@@ -139,7 +163,7 @@
               this.q = ''
               this.pts = 10
               this.valid = true
-              this.players = []
+              this.selection = null
             }
           },
           

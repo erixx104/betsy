@@ -317,7 +317,13 @@
                 this.$store.dispatch('bets/patch', {id : bet.id, state:'running'})
               }
             }
-          }          
+          }
+          
+          // set alive ping to bet, to keep function hot
+          if(!("alive_ping" in bet) || bet.alive_ping+30000 < Date.now()){
+              this.$store.dispatch('bets/patch', {id : bet.id, alive_ping : Date.now()})
+              console.log("[Bet] Alive! => "+bet.id+ "|" +Date.now())
+          }
         }
         
         // sort bets in active, requested bets
@@ -347,11 +353,14 @@
           }
           else if(bet.state=="running"){
             this.runningBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds), nVerdicts: ("verdict" in bet)?Object.keys(bet.verdict).length:null }))
+          
           }
           else if(bet.state=="declined" || bet.state=="winner" || bet.state=="noWinner" || bet.state=="agreed"){
             this.finishedBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds), nVerdicts: ("verdict" in bet)?Object.keys(bet.verdict).length:null }))
-          }else
-            console.log("That shouldn't happen: "+bet)
+          }else{
+            console.log("That shouldn't happen: ")
+            console.log(bet)
+          }
         }
       },
     },
@@ -389,7 +398,7 @@
       
       verdicts: {
           handler: function(newVal, oldVal) {
-              if(oldVal!=undefined && oldVal!=null && !_.isEmpty(oldVal, true) && !_.isEqual(oldVal,newVal))
+              if(oldVal!=undefined && oldVal!=null && !_.isEmpty(oldVal, true) && !_.isEmpty(newVal, true) && !_.isEqual(oldVal,newVal))
                 this.playSound(require('@/assets/sound5.mp3'))
               console.log(newVal)
               console.log(oldVal)

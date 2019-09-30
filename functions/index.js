@@ -20,6 +20,12 @@ exports.resolveBet = functions.region('europe-west1')
       if(!snap.before.exists)
         return true
       
+      // ---- if it was an alive ping (to keep the function hot)  
+      if(snap.before.data().alive_ping!=snap.after.data().alive_ping){
+        console.log("alive ping")
+        // don't return here, because it might be combined with some other event (eg verdict-change)
+      }
+      
       // ---------------------------- BET-Spectation when switching from "request" to "declined": transfer back scores   ------------- //
       if(snap.before.data().state === "requested" && snap.after.data().state === "declined"){
 
@@ -39,7 +45,8 @@ exports.resolveBet = functions.region('europe-west1')
       
       
       // ---------------------------- BET-Spectation when switching from "request" to "running": same selections? stop bet   ------------- //
-      if(snap.before.data().state === "requested" && snap.after.data().state === "running"){
+      // ------------> Adapted from transition to just "if state running" -> otherwise timing race condition between multiple players
+      if(snap.after.data().state === "running"){
         let selections=Object.values(snap.after.data().selection)
         
         console.log(selections)
@@ -81,7 +88,7 @@ exports.resolveBet = functions.region('europe-west1')
             let verdicts  = _.invertBy(Object.assign({}, snap.after.data().verdict))
             let selection = _.invertBy(Object.assign({}, snap.after.data().selection))
             
-            console.log(selection)
+            console.log(verdicts)
 
             // is there any verdict, which occurs the minimal amount of times? (minEqualVerdicts) -> store result and winner
             for (let [key, value] of Object.entries(verdicts)) {
