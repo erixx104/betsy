@@ -1,0 +1,53 @@
+/*
+Starten:
+    firebase functions:shell
+
+Funktionsaufruf:
+    processBets(snap = {before:before,after:after2})
+*/
+
+before={
+    "q": "Test",
+    "a": ["ABBB","BAADD","EDEDED"],
+    "created_at": "[native Date Sun Sep 29 2019 17:40:47 GMT+0200 (Mitteleuropäische Sommerzeit)]",
+    "created_by": "GHn3EDM0zKc9JhyHe60h0rVXXkz1",
+    "id": "xgbXiJBWxJqHETf3QMM5",
+    "pts": 10,
+    "selection": {
+        "GHn3EDM0zKc9JhyHe60h0rVXXkz1": 0,
+        "S4qI3BD0OEaPs7l61eFgVoJcoGE2": 2
+    },
+    "state": "winner",
+    "updated_at": "[native Date Sun Sep 29 2019 17:46:54 GMT+0200 (Mitteleuropäische Sommerzeit)]",
+    "updated_by": "S4qI3BD0OEaPs7l61eFgVoJcoGE2",
+    "verdict": {
+        "S4qI3BD0OEaPs7l61eFgVoJcoGE2": 0
+    },
+    "winner": ["GHn3EDM0zKc9JhyHe60h0rVXXkz1"],
+    "winnerAnswer": "0",
+    "nVerdicts": 2
+}
+
+after2={
+    "q": "Test",
+    "a": ["ABBB","BAADD","EDEDED"],
+    "alive_ping": 41,
+    "created_at": "[native Date Sun Sep 29 2019 17:40:47 GMT+0200 (Mitteleuropäische Sommerzeit)]",
+    "created_by": "GHn3EDM0zKc9JhyHe60h0rVXXkz1",
+    "id": "xgbXiJBWxJqHETf3QMM5",
+    "pts": 10,
+    "selection": {
+        "GHn3EDM0zKc9JhyHe60h0rVXXkz1": 0,
+        "S4qI3BD0OEaPs7l61eFgVoJcoGE2": 2
+    },
+    "state": "running",
+    "updated_at": "[native Date Sun Sep 29 2019 17:46:54 GMT+0200 (Mitteleuropäische Sommerzeit)]",
+    "updated_by": "S4qI3BD0OEaPs7l61eFgVoJcoGE2",
+    "verdict": {
+        "GHn3EDM0zKc9JhyHe60h0rVXXkz1": 0,
+        "S4qI3BD0OEaPs7l61eFgVoJcoGE2": 0
+    },
+    "winner": ["GHn3EDM0zKc9JhyHe60h0rVXXkz1"],
+    "winnerAnswer": "0",
+    "nVerdicts": 2
+}

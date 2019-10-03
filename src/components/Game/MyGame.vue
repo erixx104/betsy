@@ -304,6 +304,8 @@
           betCreated=Date.parse(bet.created_at)/1000  //to seconds
           
           age=(Math.round(Date.now()/ 1000)-betCreated)
+
+          /* ------------- MOVED TO RESOLVEBET_TRIGGER ---------------------
           if(bet.state=="requested" && age>betTime){
             if(!("selection" in bet)){
               console.log("Keiner hat geboten auf '"+bet.q+"'")
@@ -318,11 +320,14 @@
               }
             }
           }
+          */
           
           // set alive ping to bet, to keep function hot
-          if(!("alive_ping" in bet) || bet.alive_ping+30000 < Date.now()){
-              this.$store.dispatch('bets/patch', {id : bet.id, alive_ping : Date.now()})
-              console.log("[Bet] Alive! => "+bet.id+ "|" +Date.now())
+          if(age>betTime){
+            if(!("alive_ping" in bet) || bet.alive_ping+30000 < age){
+                this.$store.dispatch('bets/patch', {id : bet.id, alive_ping : age})
+                console.log("[Bet] Alive! => "+bet.id+ "|" + age)
+            }
           }
         }
         

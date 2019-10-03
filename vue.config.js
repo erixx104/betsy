@@ -11,3 +11,7 @@ module.exports = {
 // npm run build && firebase deploy
 
 // npm run serve
+
+// firebase emulators:start --only functions
+// firebase init
+// firebase emulators:start
