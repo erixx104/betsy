@@ -324,7 +324,7 @@
           
           // set alive ping to bet, to keep function hot
           if(age>betTime){
-            if(!("alive_ping" in bet) || bet.alive_ping+30000 < age){
+            if(!("alive_ping" in bet) || bet.alive_ping+30 < age){
                 this.$store.dispatch('bets/patch', {id : bet.id, alive_ping : age})
                 console.log("[Bet] Alive! => "+bet.id+ "|" + age)
             }

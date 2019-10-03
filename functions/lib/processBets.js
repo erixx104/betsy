@@ -4,7 +4,7 @@ const _ = require('lodash');
 
 
 exports.processBets = functions.region('europe-west1')
-                    .firestore.document('/games/{gameId}/players/{playerId}')
+                    .firestore.document('/games/{gameId}/bets/{betId}')
                     .onWrite((snap, context) => {
           
 
