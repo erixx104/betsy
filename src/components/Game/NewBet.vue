@@ -6,14 +6,12 @@
       @submit.prevent.native="submitBet"
       lazy-validation>
       <v-card class="mt-3">
-        <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">neue Wette</span>
-        <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1" v-if="q!=''" >{{pts}}</span>
         <v-card-title class="teal--text text--lighten-3 mb-0 pb-0" style="z-index:2;position:relative">
-          <v-text-field v-model="q" :rules="QuestionRules" class="mt-0 pt-0 mb-0 pb-0" label="Neue Wette eingeben *" validate-on-blur required single-line color="teal lighten-3"></v-text-field>
+          <v-text-field v-model="q" :rules="QuestionRules" class="mt-0 pt-0 mb-0 pb-0" label="Neue Wette eingeben" validate-on-blur required single-line color="teal lighten-3"></v-text-field>
         </v-card-title>
                   
-        <v-card-text v-if="q!=''" class="white--text d-flex flex-row justify-space-between mt-0 pt-0 mb-0 pb-0" style="z-index:2;position:relative">
-          <v-col class="mt-0 pt-0 mb-0 pb-0">
+        <v-card-text class="white--text d-flex flex-row justify-space-between mt-0 pt-0 mb-0 pb-0" style="z-index:2;position:relative">
+          <v-col v-show="q!=''" class="mt-0 pt-0 mb-0 pb-0">
 
             <div class="d-flex flex-row">
               <v-radio-group v-model="selection" :rules="SelectionRules" class="pl-2 pr-2 mt-0 pt-0 mb-0 pb-0">
@@ -44,7 +42,7 @@
           
 
 
-          <v-col>
+          <v-col v-show="q!=''" >
             <v-row style="min-width:300px">
               <v-slider
                 v-model="pts"
@@ -79,7 +77,7 @@
     export default{
         data: () => ({
             a : [],
-            q : 'ad',
+            q : '',
             selection : null,
             pts : 10,
             dialog: true,
@@ -129,6 +127,7 @@
                     a : cleanedA,
                     pts : this.pts,
                     state : 'requested',
+                    selection : { [this.$store.getters.userID] : this.selection-1 }, // -1 since IDs are different in select an DB
                     created_at : Date.now()
                 }
                 

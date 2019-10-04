@@ -305,25 +305,10 @@
           
           age=(Math.round(Date.now()/ 1000)-betCreated)
 
-          /* ------------- MOVED TO RESOLVEBET_TRIGGER ---------------------
-          if(bet.state=="requested" && age>betTime){
-            if(!("selection" in bet)){
-              console.log("Keiner hat geboten auf '"+bet.q+"'")
-              this.$store.dispatch('bets/patch', {id : bet.id, state:'declined'})
-            }else{
-              console.log("Bieter: '"+bet.q+"': "+Object.keys(bet.selection).length)
-              if(Object.keys(bet.selection).length<2){
-                this.$store.dispatch('bets/patch', {id : bet.id, state:'declined'})
-                //for(player)
-              }else{
-                this.$store.dispatch('bets/patch', {id : bet.id, state:'running'})
-              }
-            }
-          }
-          */
-          
+        
           // set alive ping to bet, to keep function hot
           if(age>betTime){
+            // console.log(bet.alive_ping+" || "+age)   ///////////////////// Needs to be checked -> never triggered....
             if(!("alive_ping" in bet) || bet.alive_ping+30 < age){
                 this.$store.dispatch('bets/patch', {id : bet.id, alive_ping : age})
                 console.log("[Bet] Alive! => "+bet.id+ "|" + age)
