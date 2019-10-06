@@ -64,7 +64,7 @@
                         if(value!=oldVal[key] && oldVal[key]=='running' && value=="winner"){ // Transition: running -> winner 
                             console.log(key+" --> NewState = "+value)
                             let bet = this.$store.getters['bets/bet'](key)
-                            this.dc.title = "Bäämmm!! Gewinner!" 
+                            this.dc.title = "Gewinner!!" 
                             this.dc.q = bet.q
                             this.dc.a = bet.a[bet.winnerAnswer]
                             this.dc.winner = bet.winner

@@ -27,7 +27,11 @@
             <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
               <div class="d-flex">
                 <ol class="body-1 white--text">
-                  <li v-for="(answer, i) in requestedBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}</li>
+                  <li v-for="(answer, i) in requestedBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
+                    <span v-for="(value, id) in requestedBet.selection" :key="id">
+                      <v-chip v-if="value==i" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
+                    </span>
+                  </li>
                 </ol>
               </div>
               
@@ -89,13 +93,7 @@
                 <ol class="body-1 white--text">
                   <li v-for="(answer, i) in runningBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
                     <span v-for="(value, id) in runningBet.selection" :key="id">
-                      <v-tooltip bottom v-if="value==i">
-                        <template v-slot:activator="{ on }">
-                          <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==id).color" size="10" :key="id">
-                          </v-list-item-avatar> 
-                        </template>
-                        <span>{{ $store.getters['players/list'].find(x => x.id==id).name }}</span>
-                      </v-tooltip>
+                      <v-chip v-if="value==i" style="font-weight:normal" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
                     </span>
                   </li>
                 </ol>
@@ -149,26 +147,20 @@
                     <ol class="body-1 white--text">
                       <li v-for="(answer, i) in finishedBet.a" :key="i" :style="(('winnerAnswer' in finishedBet) && (i==finishedBet.winnerAnswer))?'font-weight:bolder;color:#fff':'font-weight:lighter;color:#ccc'" class="mt-1 mb-1">{{ answer }}
                         <span v-for="(value, id) in finishedBet.selection" :key="id">
-                          <v-tooltip bottom v-if="value==i">
-                            <template v-slot:activator="{ on }">
-                              <v-list-item-avatar v-on="on" class="mt-0 mr-1 mb-0 ml-0 overline" :color="$store.getters['players/list'].find(x => x.id==id).color" size="10" :key="id">
-                              </v-list-item-avatar> 
-                            </template>
-                            <span>{{ $store.getters['players/list'].find(x => x.id==id).name }}</span>
-                          </v-tooltip>
+                          <v-chip v-if="value==i" style="font-weight:normal" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
                         </span>
                       </li>
                     </ol>
                   </v-row>
                   <v-row class="mt-2">
                     <div v-if="finishedBet.state=='declined'">
-                      Wette wurde nicht angenommen
+                      Kein Gewinner - Niemand wollte mitwetten
                     </div>
                     <div v-if="finishedBet.state=='agreed'">
-                      Alle haben das gleiche getippt
+                      Kein Gewinner - Alle haben das gleiche getippt
                     </div>
                     <div v-if="finishedBet.state=='noWinner'">
-                      Keiner hatte die richtige Antwort
+                      Kein Gewinner - Niemand hat die richtige Antwort gewählt
                     </div>
                     <div v-if="finishedBet.state=='winner'">
                       Gewinner: <span v-for="id in finishedBet.winner" :key="id">{{ $store.getters['players/getPlayer'](id).name }}&nbsp;</span>
@@ -283,49 +275,48 @@
       
       watchdog () {
         
+        // Keep player Online --> Alive-Ping
         if(((Date.now()-this.$store.getters['players/getUserLastOn'](this.$store.getters.userID)) / 1000) > 30){
           console.log("Alive! "+Date.now())
-          this.$store.dispatch('players/patch', {id : this.$store.getters.userID, last_online : Date.now() })
-            .catch(console.error)
-            .then(() =>{})
+          this.$store.dispatch('players/patch', {id : this.$store.getters.userID, last_online : Date.now() }).catch(console.error)
         }
         
         this.requestedBets = []
         this.runningBets = []
         this.finishedBets = []
         
-        const betTime = 40
+        var request_timer = null
         var age = null
         var betCreated = null
         
-        // clean bets (decline, if not enough users)
-        for(var bet of this.$store.getters['bets/listActiveState']){
+        // Process all bets
+        for(let bet of this.$store.getters['bets/list']){
 
-          betCreated=Date.parse(bet.created_at)/1000  //to seconds
+          // set request timer
+          if(!("type" in bet) || bet.type == "standard")
+            request_timer = 40
+          else if(bet.type == "quick")
+            request_timer = 10
+          else
+            request_timer = 40
+
+          betCreated=Date.parse(bet.created_at)/1000  // to seconds
           
-          age=(Math.round(Date.now()/ 1000)-betCreated)
+          age=(Math.round(Date.now()/ 1000)-betCreated-request_timer)
 
-        
-          // set alive ping to bet, to keep function hot
-          if(age>betTime){
+          // set alive ping to bet, to keep function hot - but PING only requested or running bets
+          if((bet.state=="requested" || bet.state=="running") && age>=0){
             // console.log(bet.alive_ping+" || "+age)   ///////////////////// Needs to be checked -> never triggered....
             if(!("alive_ping" in bet) || bet.alive_ping+30 < age){
                 this.$store.dispatch('bets/patch', {id : bet.id, alive_ping : age})
                 console.log("[Bet] Alive! => "+bet.id+ "|" + age)
             }
           }
-        }
-        
-        // sort bets in active, requested bets
-        for(bet of this.$store.getters['bets/list']){
-
-          betCreated=Date.parse(bet.created_at)/1000  // to seconds
-          
-          age=(Math.round(Date.now()/ 1000)-betCreated)
           
           if(bet.state=="requested"){
             
-            var pbWidth = Math.max(betTime-age,0)/betTime*100
+            //var pbWidth = Math.max(request_timer-age,0)/request_timer*100
+            var pbWidth = Math.max((-age/request_timer*100),0)
             var color = "#29B6F6"
 
             if(pbWidth<17)
@@ -343,7 +334,6 @@
           }
           else if(bet.state=="running"){
             this.runningBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds), nVerdicts: ("verdict" in bet)?Object.keys(bet.verdict).length:null }))
-          
           }
           else if(bet.state=="declined" || bet.state=="winner" || bet.state=="noWinner" || bet.state=="agreed"){
             this.finishedBets.push(Object.assign(bet, {age:(Math.round(Date.now()/ 1000)-bet.created_at.seconds), nVerdicts: ("verdict" in bet)?Object.keys(bet.verdict).length:null }))

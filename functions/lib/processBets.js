@@ -20,7 +20,7 @@ exports.processBets = functions.region('europe-west1')
     }
 
     // ----- if alivePing was created -> bet is older than request stage -> verify which state to transist to...
-    if(snap.after.data().alive_ping!==undefined && snap.after.data().alive_ping>=40 && snap.after.data().state === "requested"){
+    if(snap.after.data().alive_ping!==undefined && snap.after.data().alive_ping>=0 && snap.after.data().state === "requested"){
         console.log("PB: First alive ping. Age: "+snap.after.data().alive_ping)
         
         // No selection --> DECLINE
