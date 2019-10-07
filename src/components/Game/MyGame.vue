@@ -16,12 +16,12 @@
           <!-- ----------------------------------------------- Requested Bets here -------------------------------------------------------------------------->
           <v-card
               v-for="(requestedBet) in this.requestedBets" :key="requestedBet.id"
-              class="mb-6"
+              class="mb-6"  :color="(requestedBet.type=='quick')?'brown darken-4':''"
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](requestedBet.created_by).name }}</span>
             <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ requestedBet.pts }}</span>
             <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
-              {{ requestedBet.q }}
+              <v-icon class="mr-3" v-if="requestedBet.type=='quick'">mdi-clock-fast</v-icon>{{ requestedBet.q }}
             </v-card-title>
       
             <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
@@ -80,7 +80,7 @@
           <!-- ----------------------------------------------- Active Bets here -------------------------------------------------------------------------->
           <v-card
               v-for="(runningBet) in this.runningBets" :key="runningBet.id"
-              class="mb-6" 
+              class="mb-6"
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}</span>
             <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ runningBet.pts }}</span>
@@ -319,9 +319,9 @@
             var pbWidth = Math.max((-age/request_timer*100),0)
             var color = "#29B6F6"
 
-            if(pbWidth<17)
+            if(age>=-5)
               color="#FF3D00"
-            else if(pbWidth<33)
+            else if(age>=-10)
               color="#FFCA28"
               
             // Check if for specific bet the sound was already played (is on block list) - if not, play sound and add to block list

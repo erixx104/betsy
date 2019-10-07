@@ -10,11 +10,11 @@
           <v-text-field v-model="q" :rules="QuestionRules" class="mt-0 pt-0 mb-0 pb-0" label="Neue Wette eingeben" validate-on-blur required single-line color="teal lighten-3"></v-text-field>
         </v-card-title>
                   
-        <v-card-text class="white--text d-flex flex-row justify-space-between mt-0 pt-0 mb-0 pb-0" style="z-index:2;position:relative">
-          <v-col v-show="q!=''" class="mt-0 pt-0 mb-0 pb-0">
+        <v-card-text class="white--text mt-0 pt-0 mb-0 pb-0" style="z-index:2;position:relative">
+          <v-col v-show="q!=''" class="mt-0 pt-0 mb-0 pb-0" cols="12">
 
             <div class="d-flex flex-row">
-              <v-radio-group v-model="selection" :rules="SelectionRules" class="pl-2 pr-2 mt-0 pt-0 mb-0 pb-0">
+              <v-radio-group v-model="selection" :rules="SelectionRules" class="pl-2 pr-2 mt-0 pt-0 mb-0 pb-0" style="width:100%">
                 <v-row align="center">
                   <v-radio hide-details class="shrink mr-2 mt-0" :value="1" :disabled="a[1]==''"></v-radio>
                   <v-text-field :rules="AnswerRules" v-model="a[1]" label="Antwort 1*" required hint="Antwort 1" class="mt-3 pt-0"></v-text-field>
@@ -42,7 +42,8 @@
           
 
 
-          <v-col v-show="q!=''" >
+          <v-col v-show="q!=''" cols="12">
+            <!--
             <v-row style="min-width:300px">
               <v-slider
                 v-model="pts"
@@ -55,10 +56,13 @@
                 tick-size="4"
                  class="pl-2 pr-2"
                   ></v-slider>
-            </v-row>
+            </v-row>-->
             <v-row>
-              <v-btn color="deep-orange accent-2" text @click="resetBet">Close</v-btn>
-              <v-btn color="deep-orange accent-2" text type="submit">Save</v-btn>
+              <v-switch v-model="quickBet" label="Quickbet (reduced Join-Timer)" prepend-icon="mdi-clock-fast"></v-switch>
+            </v-row> 
+            <v-row>
+              <v-btn color="deep-orange accent-2" text @click="resetBet">Cancel</v-btn>
+              <v-btn color="primary" type="submit">Submit!</v-btn>
               
             </v-row>
           </v-col>
@@ -78,6 +82,7 @@
         data: () => ({
             a : [],
             q : '',
+            quickBet : false,
             selection : null,
             pts : 10,
             dialog: true,
@@ -107,6 +112,7 @@
             this.valid = true
             this.pts = 10
             this.selection = null  
+            this.quickBet = false
             //this.$refs.newBetForm.reset()
             this.$refs.newBetForm.resetValidation()
           },
@@ -126,6 +132,7 @@
                     q : this.q,
                     a : cleanedA,
                     pts : this.pts,
+                    type : (this.quickBet)?"quick":"standard",
                     state : 'requested',
                     selection : { [this.$store.getters.userID] : this.selection-1 }, // -1 since IDs are different in select an DB
                     created_at : Date.now()
@@ -142,6 +149,7 @@
                     }
                     this.q = ''
                     this.valid = true
+                    this.quickBet = false
                     this.pts = 10
                     this.selection = null
 
