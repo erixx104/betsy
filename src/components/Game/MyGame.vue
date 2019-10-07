@@ -7,7 +7,6 @@
       <v-flex xs12 md9 mt-4 pr-3>
         
           <award-bet ref="awardBet"></award-bet>
-          <join-bet ref="joinBet"></join-bet>
           <resolve-bet ref="resolveBet"></resolve-bet>
           <new-bet class="mb-6"></new-bet>
           
@@ -19,14 +18,25 @@
               class="mb-6"  :color="(requestedBet.type=='quick')?'brown darken-4':''"
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](requestedBet.created_by).name }}</span>
-            <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ requestedBet.pts }}</span>
+            <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ requestedBet.pts }}</span>
             <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
               <v-icon class="mr-3" v-if="requestedBet.type=='quick'">mdi-clock-fast</v-icon>{{ requestedBet.q }}
             </v-card-title>
       
             <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
               <div class="d-flex">
-                <ol class="body-1 white--text">
+                
+                <v-radio-group v-model="sel[requestedBet.id]" class="ml-0 pl-0 mt-0 pt-0 mb-0 pb-0" style="width:100%" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)">
+                  <v-radio v-for="(answer, i) in requestedBet.a" :key="i" hide-details class="shrink mr-2 mt-0" :value="i" :label="(i+1)+'. '+answer" >
+                    <template v-slot:label>
+                      {{ (i+1)+'. '+answer }}
+                      <span v-for="(value, id) in requestedBet.selection" :key="id" class="ml-2">
+                        <v-chip v-if="value==i" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
+                      </span>
+                    </template>
+                  </v-radio>
+                </v-radio-group>
+                <ol class="body-1 white--text" v-if="('selection' in requestedBet)&&(userID in requestedBet.selection)">
                   <li v-for="(answer, i) in requestedBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
                     <span v-for="(value, id) in requestedBet.selection" :key="id">
                       <v-chip v-if="value==i" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
@@ -43,30 +53,19 @@
                   </div>
                   
                   <div class="d-block text-center">
-                    <v-btn small color="secondary" @click="join(requestedBet.id)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)">
+                    <v-btn small color="secondary" @click="join(requestedBet.id,sel[requestedBet.id],requestedBet.pts)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)" :disabled="sel[requestedBet.id]==null">
                       einsteigen
                     </v-btn>
                   </div>
                   
-                  <div class="d-block text-center mt-2 black--text" style="min-height:28px">
-                    <div v-if="'selection' in requestedBet" >
-                      <v-tooltip class="ml-1 mr-1" bottom  v-for="(value, id) in requestedBet.selection" :key="id">
-                        <template v-slot:activator="{ on }">
-                          <v-list-item-avatar v-on="on" class="mt-0 mr-0 mb-0 ml-0" :color="$store.getters['players/list'].find(x => x.id==id).color" size="28" :key="id">
-                            {{ $store.getters['players/list'].find(x => x.id==id).initials }}     
-                          </v-list-item-avatar> 
-                        </template>
-                        <span>{{ $store.getters['players/list'].find(x => x.id==id).name }}</span>
-                      </v-tooltip>
-                    </div>
-                  </div>
+                  
                 </div>
                 
               </div>
             </v-card-text>
 
             <v-card-actions class="d-flex d-sm-none" >
-              <v-btn class="mb-3" small outlined block color="secondary" @click="join(requestedBet.id)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)">
+              <v-btn class="mb-3" small outlined block color="secondary" @click="join(requestedBet.id,sel[requestedBet.id],requestedBet.pts)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)" :disabled="sel[requestedBet.id]==null">
                   einsteigen
                 </v-btn>
             </v-card-actions>
@@ -83,7 +82,7 @@
               class="mb-6"
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}</span>
-            <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ runningBet.pts }}</span>
+            <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ runningBet.pts }}</span>
             <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
               {{ runningBet.q }}
             </v-card-title>
@@ -129,13 +128,13 @@
           
           
           <v-subheader>Abgeschlossene Wetten</v-subheader>
-          <!-- ------------------------------------------------------------------------------------------------------------------------------------------->
+          <!-- ------------------------------------ Finished bets  here------------------------------------------------------------------------------------------------------->
           <v-card
               v-for="(finishedBet) in this.finishedBets" :key="finishedBet.id"
               class="mb-6"  outlined style="background-color: transparent!important;opacity:0.7"
             >
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}</span>
-            <span style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ finishedBet.pts }}</span>
+            <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ finishedBet.pts }}</span>
             <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
               {{ finishedBet.q }}
             </v-card-title>
@@ -187,7 +186,6 @@
 
 <script>
   import NewBet from './NewBet.vue'
-  import JoinBet from './JoinBet.vue'
   import ResolveBet from './ResolveBet.vue'
   import AwardBet from './AwardBet.vue'
   import Scoreboard from './Scoreboard.vue'
@@ -202,12 +200,12 @@
       finishedBets : [],
       blockSound_requested : [],
       watchdogInterval : null,
-      started : false
+      started : false,
+      sel : [] //selection in join bet dialog
       
     }),
     components:{
          'new-bet':NewBet,
-         'join-bet':JoinBet,
          'resolve-bet':ResolveBet,
          'award-bet':AwardBet,
          'scoreboard':Scoreboard
@@ -260,10 +258,17 @@
         this.$store.dispatch('loaderOff') 
       },
       
-      join (value) {
-        this.$refs.joinBet.content=this.$store.getters['bets/listActiveState'].find(x => x.id==value)
-        this.$refs.joinBet.dialog=1
-        console.log(this.$refs.joinBet.content)
+      join (bet, selection, pts) {
+        let selObj = {}
+        selObj[this.$store.getters.userID]=selection
+
+        this.$store.dispatch('bets/patch', {id : bet, selection : selObj })
+                .catch(console.error)
+                .then(() =>{
+                    this.dialog = false
+                    this.$store.dispatch('addUserScore', {user: this.$store.getters.userID, score: -pts})
+                })
+        console.log(bet + " | " + selection)
       },
       
       resolve (value) {
@@ -380,8 +385,8 @@
           handler: function(newVal, oldVal) {
               if(oldVal!=undefined && oldVal!=null && !_.isEmpty(oldVal, true) && !_.isEmpty(newVal, true) && !_.isEqual(oldVal,newVal))
                 this.playSound(require('@/assets/sound5.mp3'))
-              console.log(newVal)
-              console.log(oldVal)
+              //console.log(newVal)
+              //console.log(oldVal)
               
           },
           deep: true

@@ -61,8 +61,8 @@
               <v-switch v-model="quickBet" label="Quickbet (reduced Join-Timer)" prepend-icon="mdi-clock-fast"></v-switch>
             </v-row> 
             <v-row>
-              <v-btn color="deep-orange accent-2" text @click="resetBet">Cancel</v-btn>
-              <v-btn color="primary" type="submit">Submit!</v-btn>
+              <v-btn color="deep-orange accent-2" text @click="resetBet">Abbrechen</v-btn>
+              <v-btn color="primary" type="submit">Wette abgeben</v-btn>
               
             </v-row>
           </v-col>
