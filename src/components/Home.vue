@@ -2,7 +2,41 @@
   <v-container>
     <v-layout row wrap>
       <v-flex xs12 sm8 offset-sm2>
-        <h3>Welcome!! Join or create a new game</h3>
+        <h3>Welcome!! Pick a game and a name!</h3>
+
+        <v-row justify="center">
+          <v-col
+            v-for="card in this.$store.getters['games/listGames']"
+            :key="card.title"
+            cols="12"
+            md="6"
+            lg="4"
+
+          >
+            <v-card hover 
+              @click="gameID=card.link" 
+              :disabled="(Date.now()/1000 > card.event_start.seconds)?false:true"
+              :style="(gameID==card.link)?'border:1px solid white':'border:1px solid transparent'"
+              :elevation="(gameID==card.link)?'20':'10'">
+              <v-img
+                :src="card.img"
+                class="white--text"
+                height="400px"
+                gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
+              >
+                <v-card-title
+                  class="fill-height align-end"
+                  v-text="card.title"
+                ></v-card-title>
+              </v-img>
+
+              <v-card-text>
+                Starts: soon <!--{{ card.event_start.seconds }}-->
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-row>
+
 
         <v-form
           ref="form"
@@ -19,7 +53,7 @@
 
           <v-btn class="primary mb-6 mt-2" v-if="0">Create game</v-btn>
           
-          <v-text-field
+          <v-text-field v-show="false"
             v-model="gameID"
             :counter="5"
             :rules="[ checkGameId ]"
@@ -37,15 +71,7 @@
           >
             Join
           </v-btn>
-          
-          
-          
         </v-form>
-      </v-flex>
-    </v-layout>
-    <v-layout mt-6>
-      <v-flex class="caption" xs12 sm8 offset-sm2>
-        Try ABCDE or FGHIJ as games...
       </v-flex>
     </v-layout>
   </v-container>
