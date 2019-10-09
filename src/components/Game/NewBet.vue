@@ -113,7 +113,6 @@
             this.pts = 10
             this.selection = null  
             this.quickBet = false
-            //this.$refs.newBetForm.reset()
             this.$refs.newBetForm.resetValidation()
           },
           
@@ -134,7 +133,7 @@
                     pts : this.pts,
                     type : (this.quickBet)?"quick":"standard",
                     state : 'requested',
-                    selection : { [this.$store.getters.userID] : this.selection-1 }, // -1 since IDs are different in select an DB
+                    selection : { [this.$store.getters.userID] : this.selection-1 }, // -1 since IDs are different in select and DB
                     created_at : Date.now()
                 }
                 
@@ -142,7 +141,9 @@
                 this.$store.dispatch('bets/insert', bet)
                 .catch(console.error)
                 .then(() =>{
-                  
+
+                    this.$store.dispatch('addUserScore', {user: this.$store.getters.userID, score: -this.pts})
+
                     // clean overlay
                     for (var i = 1; i < 10; i++) {
                       this.a[i] = '';

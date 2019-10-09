@@ -20,7 +20,7 @@
                   <v-list-item-title v-text="user['name']"></v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-content class="right">
-                  <v-list-item-title v-text="user['score']" class="text-right"></v-list-item-title>
+                  <v-list-item-title v-text="user['score']" class="text-right" :style="user.score<0 ? 'color: red!important':''"></v-list-item-title>
                 </v-list-item-content>
               </v-list-item>
             </v-list-item-group>

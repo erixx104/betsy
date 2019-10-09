@@ -104,21 +104,14 @@
           
           try {
             this.$store.dispatch('loaderOn') 
-
             await this.$store.dispatch('registerUser', {gameID: this.$store.getters['games/getIdForLink'](this.gameID), playerName:this.playerName})
-
-            //await this.$store.dispatch('players/closeDBChannel', {clearModule: true})
-            //await new Promise(resolve => setTimeout(resolve, 2000)); //Timeout one-liner between async statements
             console.log("gameID: "+this.$store.getters['games/getIdForLink'](this.gameID))
             console.log(this.$store.state['players']._sync)
             await this.$store.dispatch('players/setPathVars',{gameID: this.$store.getters['games/getIdForLink'](this.gameID)})
             console.log(this.$store.state['players']._sync)
-            await this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:10, last_online:Date.now()}) )
-
+            await this.$store.dispatch('players/insert', Object.assign(this.$store.getters.user, {score:0, last_online:Date.now()}) )
             await this.$store.dispatch('games/closeDBChannel')
-
             this.$router.push({ path: `/MyGame` })
-            
             this.$store.dispatch('loaderOff')
             
           } catch (e) {
