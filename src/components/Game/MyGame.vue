@@ -8,7 +8,7 @@
         
           <award-bet ref="awardBet"></award-bet>
           <resolve-bet ref="resolveBet"></resolve-bet>
-          <new-bet class="mb-6"></new-bet>
+          <new-bet ref="newBet" class="mb-6"></new-bet>
           
           <v-subheader v-if="(this.requestedBets.length)">Angebotene Wetten</v-subheader>
           
@@ -20,7 +20,9 @@
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](requestedBet.created_by).name }}</span>
             <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ requestedBet.pts }}</span>
             <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
-              <v-icon class="mr-3" v-if="requestedBet.type=='quick'">mdi-clock-fast</v-icon>{{ requestedBet.q }}
+              <v-icon class="mr-3" v-if="requestedBet.type=='quick'">mdi-clock-fast</v-icon>
+              <v-icon class="mr-3" v-if="requestedBet.type!=='quick'">mdi-format-list-checks</v-icon>
+              {{ requestedBet.q }}
             </v-card-title>
       
             <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
@@ -84,6 +86,8 @@
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}</span>
             <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ runningBet.pts }}</span>
             <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
+              <v-icon class="mr-3" v-if="runningBet.type=='quick'">mdi-clock-fast</v-icon>
+              <v-icon class="mr-3" v-if="runningBet.type!=='quick'">mdi-format-list-checks</v-icon>
               {{ runningBet.q }}
             </v-card-title>
       
@@ -127,7 +131,7 @@
           </v-card>
           
           
-          <v-subheader>Abgeschlossene Wetten</v-subheader>
+          <v-subheader class="mt-12">Abgeschlossene Wetten</v-subheader>
           <!-- ------------------------------------ Finished bets  here------------------------------------------------------------------------------------------------------->
           <v-card
               v-for="(finishedBet) in this.finishedBets" :key="finishedBet.id"
@@ -136,6 +140,8 @@
             <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}</span>
             <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ finishedBet.pts }}</span>
             <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
+              <v-icon class="mr-3" v-if="finishedBet.type=='quick'">mdi-clock-fast</v-icon>
+              <v-icon class="mr-3" v-if="finishedBet.type!=='quick'">mdi-format-list-checks</v-icon>
               {{ finishedBet.q }}
             </v-card-title>
       
@@ -146,7 +152,7 @@
                     <ol class="body-1 white--text">
                       <li v-for="(answer, i) in finishedBet.a" :key="i" :style="(('winnerAnswer' in finishedBet) && (i==finishedBet.winnerAnswer))?'font-weight:bolder;color:#fff':'font-weight:lighter;color:#ccc'" class="mt-1 mb-1">{{ answer }}
                         <span v-for="(value, id) in finishedBet.selection" :key="id">
-                          <v-chip v-if="value==i" style="font-weight:normal" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
+                          <v-chip v-if="value==i" style="font-weight:normal;opacity:0.7" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
                         </span>
                       </li>
                     </ol>
@@ -172,6 +178,11 @@
                 <div class="d-block justify-center">
                   <div style="right:7px;top:2px" class="d-block mb-1 overline grey--text text-center">
                     Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}
+                  </div>
+                  <div class="d-block text-center">
+                    <v-btn class="mb-1" small outlined color="light-blue darken-3" @click="replay(finishedBet.id)">
+                      nochmal wetten
+                    </v-btn>
                   </div>
                 </div>
               </div>
@@ -276,6 +287,32 @@
         this.$refs.resolveBet.dialog=1
         console.log(this.$refs.resolveBet.content)
       },
+
+      replay (value) {
+
+        // clear answers
+        for (var i = 1; i < 10; i++) {
+          this.$refs.newBet.a[i] = '';
+        }
+
+        let bet = this.$store.getters['bets/bet'](value)
+        this.$refs.newBet.reset
+        this.$refs.newBet.q = bet.q
+        this.$refs.newBet.pts = bet.pts
+        console.log(bet.a)
+        for(const [key, value] of Object.entries(bet.a)){
+          this.$refs.newBet.a[parseInt(key)+1]=value
+          console.log(key + "|" + value)
+        }
+
+
+        if(("type" in bet) && bet.type=="quick")
+          this.$refs.newBet.quickBet = true
+        else
+          this.$refs.newBet.quickBet = false
+
+        window.scrollTo(0,0);
+      },
       
       
       watchdog () {
@@ -309,7 +346,7 @@
           
           age=(Math.round(Date.now()/ 1000)-betCreated-request_timer)
 
-          // set alive ping to bet, to keep function hot - but PING only requested or running bets
+          // set alive ping to bet, to keep function hot - but PING only "requested" or "running" bets
           if((bet.state=="requested" || bet.state=="running") && age>=0){
             // console.log(bet.alive_ping+" || "+age)   ///////////////////// Needs to be checked -> never triggered....
             if(!("alive_ping" in bet) || bet.alive_ping+30 < age){
@@ -320,7 +357,6 @@
           
           if(bet.state=="requested"){
             
-            //var pbWidth = Math.max(request_timer-age,0)/request_timer*100
             var pbWidth = Math.max((-age/request_timer*100),0)
             var color = "#29B6F6"
 
