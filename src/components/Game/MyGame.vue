@@ -32,7 +32,7 @@
                   <v-radio v-for="(answer, i) in requestedBet.a" :key="i" hide-details class="shrink mr-2 mt-0" :value="i" :label="(i+1)+'. '+answer" >
                     <template v-slot:label>
                       {{ (i+1)+'. '+answer }}
-                      <span v-for="(value, id) in requestedBet.selection" :key="id" class="ml-2">
+                      <span v-for="(value, id) in requestedBet.selection" :key="id" class="mr-1">
                         <v-chip v-if="value==i" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
                       </span>
                     </template>
@@ -40,7 +40,7 @@
                 </v-radio-group>
                 <ol class="body-1 white--text" v-if="('selection' in requestedBet)&&(userID in requestedBet.selection)">
                   <li v-for="(answer, i) in requestedBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
-                    <span v-for="(value, id) in requestedBet.selection" :key="id">
+                    <span v-for="(value, id) in requestedBet.selection" :key="id" class="mr-1">
                       <v-chip v-if="value==i" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
                     </span>
                   </li>
@@ -95,7 +95,7 @@
               <div class="d-flex">
                 <ol class="body-1 white--text">
                   <li v-for="(answer, i) in runningBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
-                    <span v-for="(value, id) in runningBet.selection" :key="id">
+                    <span v-for="(value, id) in runningBet.selection" :key="id" class="mr-1">
                       <v-chip v-if="value==i" style="font-weight:normal" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
                     </span>
                   </li>
@@ -151,7 +151,7 @@
                   <v-row class="mb-0 mt-0 pb-0 pt-0">
                     <ol class="body-1 white--text">
                       <li v-for="(answer, i) in finishedBet.a" :key="i" :style="(('winnerAnswer' in finishedBet) && (i==finishedBet.winnerAnswer))?'font-weight:bolder;color:#fff':'font-weight:lighter;color:#ccc'" class="mt-1 mb-1">{{ answer }}
-                        <span v-for="(value, id) in finishedBet.selection" :key="id">
+                        <span v-for="(value, id) in finishedBet.selection" :key="id" class="mr-1">
                           <v-chip v-if="value==i" style="font-weight:normal;opacity:0.7" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
                         </span>
                       </li>
