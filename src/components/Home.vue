@@ -31,7 +31,12 @@
               </v-img>
 
               <v-card-text>
-                Starts: soon <!--{{ card.event_start.seconds }}-->
+                <div v-if="(Date.now()/1000 > card.event_start.seconds)">
+                Läuft schon {{ card.event_start.seconds | moment("from","now", true) }}
+                </div>
+                <div v-else>
+                Startet {{ card.event_start.seconds | moment("dddd, Do MMMM, [um] LT [Uhr]") }}
+                </div>
               </v-card-text>
             </v-card>
           </v-col>
