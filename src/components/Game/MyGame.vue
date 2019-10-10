@@ -9,186 +9,44 @@
           <award-bet ref="awardBet"></award-bet>
           <resolve-bet ref="resolveBet"></resolve-bet>
           <new-bet ref="newBet" class="mb-6"></new-bet>
-          
+
+          <!-- ----------------------------------------------- Requested Bets here -------------------------------------------------------------------------->          
           <v-subheader v-if="(this.requestedBets.length)">Angebotene Wetten</v-subheader>
-          
-          <!-- ----------------------------------------------- Requested Bets here -------------------------------------------------------------------------->
-          <v-card
-              v-for="(requestedBet) in this.requestedBets" :key="requestedBet.id"
-              class="mb-6"  :color="(requestedBet.type=='quick')?'brown darken-4':''"
-            >
-            <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](requestedBet.created_by).name }}</span>
-            <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ requestedBet.pts }}</span>
-            <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
-              <v-icon class="mr-3" v-if="requestedBet.type=='quick'">mdi-clock-fast</v-icon>
-              <v-icon class="mr-3" v-if="requestedBet.type!=='quick'">mdi-format-list-checks</v-icon>
-              {{ requestedBet.q }}
-            </v-card-title>
-      
-            <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
-              <div class="d-flex">
-                
-                <v-radio-group v-model="sel[requestedBet.id]" class="ml-0 pl-0 mt-0 pt-0 mb-0 pb-0" style="width:100%" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)">
-                  <v-radio v-for="(answer, i) in requestedBet.a" :key="i" hide-details class="shrink mr-2 mt-0" :value="i" :label="(i+1)+'. '+answer" >
-                    <template v-slot:label>
-                      {{ (i+1)+'. '+answer }}
-                      <span v-for="(value, id) in requestedBet.selection" :key="id" class="mr-1">
-                        <v-chip v-if="value==i" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
-                      </span>
-                    </template>
-                  </v-radio>
-                </v-radio-group>
-                <ol class="body-1 white--text" v-if="('selection' in requestedBet)&&(userID in requestedBet.selection)">
-                  <li v-for="(answer, i) in requestedBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
-                    <span v-for="(value, id) in requestedBet.selection" :key="id" class="mr-1">
-                      <v-chip v-if="value==i" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
-                    </span>
-                  </li>
-                </ol>
-              </div>
-              
-              <div class="flex-column justify-center align-end d-sm-flex d-none">
-                <div class="d-block justify-center">
-                
-                  <div class="d-block mb-1 overline grey--text text-center">
-                    Wette von {{ $store.getters['players/getPlayer'](requestedBet.created_by).name }}
-                  </div>
-                  
-                  <div class="d-block text-center">
-                    <v-btn small color="secondary" @click="join(requestedBet.id,sel[requestedBet.id],requestedBet.pts)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)" :disabled="sel[requestedBet.id]==null">
-                      einsteigen
-                    </v-btn>
-                  </div>
-                  
-                  
-                </div>
-                
-              </div>
-            </v-card-text>
-
-            <v-card-actions class="d-flex d-sm-none" >
-              <v-btn class="mb-3" small outlined block color="secondary" @click="join(requestedBet.id,sel[requestedBet.id],requestedBet.pts)" v-if="!('selection' in requestedBet)||!(userID in requestedBet.selection)" :disabled="sel[requestedBet.id]==null">
-                  einsteigen
-                </v-btn>
-            </v-card-actions>
-
-            <v-progress-linear :value="requestedBet.pbWidth" :color="requestedBet.color" absolute bottom ></v-progress-linear>
-          </v-card>
+          <div v-for="(bet) in this.requestedBets" :key="bet.id">
+            <bet-multiplechoice
+              v-if="bet.type==undefined || bet.type=='quick' || bet.type=='standard'"
+              :bet="bet"
+              :join="join"
+              :resolve="resolve"
+              :replay="replay"
+            ></bet-multiplechoice>
+          </div>
           
           
+          <!-- ----------------------------------------------- Active Bets here -------------------------------------------------------------------------->          
           <v-subheader>Aktive Wetten</v-subheader>
+          <div v-for="(bet) in this.runningBets" :key="bet.id">
+            <bet-multiplechoice
+              v-if="bet.type==undefined || bet.type=='quick' || bet.type=='standard'"
+              :bet="bet"
+              :join="join"
+              :resolve="resolve"
+              :replay="replay"
+            ></bet-multiplechoice>
+          </div>
           
-          <!-- ----------------------------------------------- Active Bets here -------------------------------------------------------------------------->
-          <v-card
-              v-for="(runningBet) in this.runningBets" :key="runningBet.id"
-              class="mb-6"
-            >
-            <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}</span>
-            <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ runningBet.pts }}</span>
-            <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
-              <v-icon class="mr-3" v-if="runningBet.type=='quick'">mdi-clock-fast</v-icon>
-              <v-icon class="mr-3" v-if="runningBet.type!=='quick'">mdi-format-list-checks</v-icon>
-              {{ runningBet.q }}
-            </v-card-title>
-      
-            <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
-              <div class="d-flex">
-                <ol class="body-1 white--text">
-                  <li v-for="(answer, i) in runningBet.a" :key="i" style="font-color:rgba(255, 255, 255, 1.0)!important" class="mt-1 mb-1">{{ answer }}
-                    <span v-for="(value, id) in runningBet.selection" :key="id" class="mr-1">
-                      <v-chip v-if="value==i" style="font-weight:normal" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
-                    </span>
-                  </li>
-                </ol>
-              </div>
-              
-              <div class="flex-column justify-center align-end d-sm-flex d-none">
-                <div class="d-block justify-center">
-                  <div style="right:7px;top:2px" class="d-block mb-1 overline grey--text text-center">
-                    Wette von {{ $store.getters['players/getPlayer'](runningBet.created_by).name }}
-                  </div>
-                  <div class="d-block text-center">
-                    <v-btn :disabled="!(userID in runningBet.selection)" class="mb-1" :class="Object.keys(runningBet.selection).length>0?'':'deep-orange accent-3'" small color="light-blue darken-3" @click="resolve(runningBet.id)">
-                      auflösen
-                    </v-btn>
-                  </div>
-                  <div class="d-block text-center overline grey--text">
-                    gelöst: 
-                    <v-progress-circular :value="100*(runningBet.nVerdicts/Math.ceil(Object.keys(runningBet.selection).length*0.51))" size="30" color="light-blue darken-5" :class="runningBet.nVerdicts==0?'':'deep-orange--text text--accent-2'">
-                      {{ Math.ceil(Object.keys(runningBet.selection).length*0.51) }}
-                    </v-progress-circular>                    
-                  </div>
-                </div>
-              </div>
-            </v-card-text>
-
-            <v-card-actions class="d-flex d-sm-none" >
-              <v-btn :disabled="!(userID in runningBet.selection)" class="mb-1" small outlined block color="light-blue darken-3" :class="Object.keys(runningBet.selection).length>0?'':'deep-orange accent-3'" @click="resolve(runningBet.id)">
-                auflösen ({{runningBet.nVerdicts?runningBet.nVerdicts:0}}/{{(Object.keys(runningBet.selection).length)}})
-              </v-btn>
-            </v-card-actions>
-
-          </v-card>
-          
-          
-          <v-subheader class="mt-12">Abgeschlossene Wetten</v-subheader>
           <!-- ------------------------------------ Finished bets  here------------------------------------------------------------------------------------------------------->
-          <v-card
-              v-for="(finishedBet) in this.finishedBets" :key="finishedBet.id"
-              class="mb-6"  outlined style="background-color: transparent!important;opacity:0.7"
-            >
-            <span style="position:absolute;right:7px;top:2px" class="overline grey--text d-flex d-sm-none">Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}</span>
-            <span v-if="false" style="position:absolute;right:138px;bottom:-27px;color:#555;font-weight:bolder;font-size:104pt;z-index:1">{{ finishedBet.pts }}</span>
-            <v-card-title class="teal--text text--lighten-3" style="z-index:2;position:relative">
-              <v-icon class="mr-3" v-if="finishedBet.type=='quick'">mdi-clock-fast</v-icon>
-              <v-icon class="mr-3" v-if="finishedBet.type!=='quick'">mdi-format-list-checks</v-icon>
-              {{ finishedBet.q }}
-            </v-card-title>
-      
-            <v-card-text class="white--text d-flex flex-row justify-space-between" style="z-index:2;position:relative">
-              <div class="d-flex">
-                <v-container class="mb-0 mt-0 pb-0 pt-0">
-                  <v-row class="mb-0 mt-0 pb-0 pt-0">
-                    <ol class="body-1 white--text">
-                      <li v-for="(answer, i) in finishedBet.a" :key="i" :style="(('winnerAnswer' in finishedBet) && (i==finishedBet.winnerAnswer))?'font-weight:bolder;color:#fff':'font-weight:lighter;color:#ccc'" class="mt-1 mb-1">{{ answer }}
-                        <span v-for="(value, id) in finishedBet.selection" :key="id" class="mr-1">
-                          <v-chip v-if="value==i" style="font-weight:normal;opacity:0.7" text-color="#222" small :color="$store.getters['players/list'].find(x => x.id==id).color">{{ $store.getters['players/list'].find(x => x.id==id).name }}</v-chip>
-                        </span>
-                      </li>
-                    </ol>
-                  </v-row>
-                  <v-row class="mt-2">
-                    <div v-if="finishedBet.state=='declined'">
-                      Kein Gewinner - Niemand wollte mitwetten
-                    </div>
-                    <div v-if="finishedBet.state=='agreed'">
-                      Kein Gewinner - Alle haben das gleiche getippt
-                    </div>
-                    <div v-if="finishedBet.state=='noWinner'">
-                      Kein Gewinner - Niemand hat die richtige Antwort gewählt
-                    </div>
-                    <div v-if="finishedBet.state=='winner'">
-                      Gewinner: <span v-for="id in finishedBet.winner" :key="id">{{ $store.getters['players/getPlayer'](id).name }}&nbsp;</span>
-                    </div>
-                  </v-row>
-                </v-container>
-              </div>
-              
-              <div class="flex-column justify-center align-end d-sm-flex d-none">
-                <div class="d-block justify-center">
-                  <div style="right:7px;top:2px" class="d-block mb-1 overline grey--text text-center">
-                    Wette von {{ $store.getters['players/getPlayer'](finishedBet.created_by).name }}
-                  </div>
-                  <div class="d-block text-center">
-                    <v-btn class="mb-1" small outlined color="light-blue darken-3" @click="replay(finishedBet.id)">
-                      nochmal wetten
-                    </v-btn>
-                  </div>
-                </div>
-              </div>
-            </v-card-text>
-          </v-card>
-          
+          <v-subheader class="mt-12">Abgeschlossene Wetten</v-subheader>
+          <div v-for="(bet) in this.finishedBets" :key="bet.id">
+            <bet-multiplechoice
+              v-if="bet.type==undefined || bet.type=='quick' || bet.type=='standard'"
+              :bet="bet"
+              :join="join"
+              :resolve="resolve"
+              :replay="replay"
+            ></bet-multiplechoice>
+          </div>
+         
       </v-flex>
       
     </v-layout> 
@@ -199,6 +57,7 @@
   import NewBet from './NewBet.vue'
   import ResolveBet from './ResolveBet.vue'
   import AwardBet from './AwardBet.vue'
+  import Bet_MultipleChoice from './Bet_MultipleChoice.vue'
   import Scoreboard from './Scoreboard.vue'
   const _ = require('lodash');
 
@@ -212,14 +71,15 @@
       blockSound_requested : [],
       watchdogInterval : null,
       started : false,
-      sel : [] //selection in join bet dialog
+
       
     }),
     components:{
          'new-bet':NewBet,
          'resolve-bet':ResolveBet,
          'award-bet':AwardBet,
-         'scoreboard':Scoreboard
+         'scoreboard':Scoreboard,
+         'bet-multiplechoice':Bet_MultipleChoice
      },
      
      beforeCreate () {
@@ -338,7 +198,7 @@
           if(!("type" in bet) || bet.type == "standard")
             request_timer = 40
           else if(bet.type == "quick")
-            request_timer = 10
+            request_timer = 20
           else
             request_timer = 40
 
@@ -357,7 +217,7 @@
           
           if(bet.state=="requested"){
             
-            var pbWidth = Math.max((-age/request_timer*100),0)
+            var pbWidth = Math.min(Math.max(( (-age/request_timer) *100),0),100)
             var color = "#29B6F6"
 
             if(age>=-5)
